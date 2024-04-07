@@ -1,6 +1,6 @@
 import json
 import requests  
-from openpyxl import Workbook
+import csv
 
 def download_file_with_user_agent(url, local_filename, user_agent):  
     # 设置请求头，包括User-Agent  
@@ -28,27 +28,20 @@ download_file_with_user_agent(url, local_filename, user_agent)
 
 
 # 从 JSON 文件中加载数据
-with open('json/school_id.json', 'r') as file:
+with open('json/school_id.json', 'r', encoding='utf-8') as file:
     json_string = file.read()
 
 # 解析 JSON 数据
 parsed_data = json.loads(json_string)
 
-# 创建一个新的 Excel 工作簿
-wb = Workbook()
-ws = wb.active
+# 提取 school_id 和 name 数据并写入 CSV 文件
+with open('csv/school_id.csv', mode='w', newline='', encoding='utf-8-sig') as csv_file:
+    writer = csv.writer(csv_file)
+    writer.writerow(["学校名称Name", "学校ID号school_id"])  # 写入表头
+    school_data = parsed_data["data"]
+    for key, value in school_data.items():
+        school_id = value["school_id"]
+        name = value["name"]
+        writer.writerow([name, school_id])
 
-# 添加表头
-ws.append(["学校名称Name", "学校ID号school_id"])
-
-# 提取 school_id 和 name 数据并写入 Excel 文件和txt文件
-school_data = parsed_data["data"]
-for key, value in school_data.items():
-    school_id = value["school_id"]
-    name = value["name"]
-    ws.append([name, school_id])
-    with open("txt/school_id.txt", "a", encoding="utf-8") as txt_file:
-        txt_file.write(f"学校名称：{name}\t学校ID号：{school_id}\n")
-
-# 保存 Excel 文件
-wb.save("excel/school_id.xlsx")
+print(f"数据已成功保存到csv文件夹中。")

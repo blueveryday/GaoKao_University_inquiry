@@ -23,7 +23,7 @@ def run_code(choice, headers=None):
         clear_screen()
         # 各省分数线
         local_province_id = input("请输入新高考的省市区代码（渝:50，其他可以查看Province_ID.txt）: ")
-        local_type_id = input("请输入文理科代码（2073代表理科，2074代表文科（大类招生））: ")
+        local_type_id = input("请输入文理科代码（2073代表物理类，2074代表历史类）")
         school_id = input("请输入学校ID（比如清华大学:140）: ")
         year = input("请输入录取年份: ")
 
@@ -39,20 +39,25 @@ def run_code(choice, headers=None):
             'year': year
         }
         url = base_url + '&'.join([f"{key}={value}" for key, value in parameters.items()])
-        local_filename = 'json/gsfsx.json'
+        local_filename = 'source/gsfsx.json'
 
+        # 检查并创建 csv 和 source 文件夹
         csv_folder = 'csv'
         if not os.path.exists(csv_folder):
             os.makedirs(csv_folder)
+        source_folder = 'source'
+        if not os.path.exists(source_folder):
+            os.makedirs(source_folder)
 
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
+
         download_file(url, local_filename, headers=headers)
 
-        with open('json/gsfsx.json') as f:
-            data = json.load(f)
+        with open('source/gsfsx.json', encoding='utf-8') as f:
+            data = json.loads(f.read())
             items = data['data']['item']
 
-        csv_file_path = f"{csv_folder}/{school_id}_{year}_各省分数线.csv"
+        csv_file_path = f"{csv_folder}/学校ID-{school_id}_{items[0]['name']}_{items[0]['local_province_name']}_{year}_各省分数线.csv"
 
         with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file:
             writer = csv.writer(csv_file)
@@ -80,7 +85,7 @@ def run_code(choice, headers=None):
         clear_screen()
         # 专业分数线
         local_province_id = input("请输入新高考的省市区代码（渝:50，其他可以查看Province_ID.txt）: ")
-        local_type_id = input("请输入文理科代码（2073代表理科，2074代表文科（大类招生））: ")
+        local_type_id = input("请输入文理科代码（2073代表物理类，2074代表历史类）")
         school_id = input("请输入学校ID（比如清华大学:140）: ")
         year = input("请输入录取年份: ")
 
@@ -97,20 +102,24 @@ def run_code(choice, headers=None):
             'year': year
         }
         url = base_url + '&'.join([f"{key}={value}" for key, value in parameters.items()])
-        local_filename = 'json/zyfsx.json'
+        local_filename = 'source/zyfsx.json'
 
+        # 检查并创建 csv 和 source 文件夹
         csv_folder = 'csv'
         if not os.path.exists(csv_folder):
             os.makedirs(csv_folder)
+        source_folder = 'source'
+        if not os.path.exists(source_folder):
+            os.makedirs(source_folder)
 
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
         download_file(url, local_filename, headers=headers)
 
-        with open('json/zyfsx.json') as f:
-            data = json.load(f)
+        with open('source/zyfsx.json', encoding='utf-8') as f:
+            data = json.loads(f.read())
             items = data['data']['item']
 
-        csv_file_path = f"{csv_folder}/{school_id}_{year}_专业分数线.csv"
+        csv_file_path = f"{csv_folder}/学校ID-{school_id}_{items[0]['name']}_{items[0]['local_province_name']}_{year}_专业分数线.csv"
 
         with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file:
             writer = csv.writer(csv_file)
@@ -135,7 +144,7 @@ def run_code(choice, headers=None):
         clear_screen()
         # 查询招生计划
         local_province_id = input("请输入新高考的省市区代码（渝:50，其他可以查看Province_ID.txt）: ")
-        local_type_id = input("请输入文理科代码（2073代表理科，2074代表文科（大类招生））: ")
+        local_type_id = input("请输入文理科代码（2073代表物理类，2074代表历史类）")
         school_id = input("请输入学校ID（比如清华大学:140）: ")
         year = input("请输入录取年份: ")
 
@@ -152,20 +161,24 @@ def run_code(choice, headers=None):
             'year': year
         }
         url = base_url + '&'.join([f"{key}={value}" for key, value in parameters.items()])
-        local_filename = 'json/zsjh.json'
+        local_filename = 'source/zsjh.json'
 
+        # 检查并创建 csv 和 source 文件夹
         csv_folder = 'csv'
         if not os.path.exists(csv_folder):
             os.makedirs(csv_folder)
+        source_folder = 'source'
+        if not os.path.exists(source_folder):
+            os.makedirs(source_folder)
 
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
         download_file(url, local_filename, headers=headers)
 
-        with open('json/zsjh.json') as f:
-            data = json.load(f)
+        with open('source/zsjh.json', encoding='utf-8') as f:
+            data = json.loads(f.read())
             items = data['data']['item']
 
-        csv_file_path = f"{csv_folder}/{school_id}_{year}_招生计划.csv"
+        csv_file_path = f"{csv_folder}/学校ID-{school_id}_{items[0]['name']}_省市区代码-{local_province_id}_{year}_招生计划.csv"
 
         with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file:
             writer = csv.writer(csv_file)
@@ -195,11 +208,14 @@ def run_code(choice, headers=None):
         response = requests.get(url, headers=headers)
 
         if response.status_code == 200:
-            with open('json/pc_special.json', 'w') as f:
+            if not os.path.exists('source'):
+                os.makedirs('source')
+
+            with open('source/pc_special.json', 'w') as f:
                 f.write(response.text)
             print("JSON 文件已成功下载并保存。")
 
-            with open('json/pc_special.json') as f:
+            with open('source/pc_special.json', encoding='utf-8') as f:
                 data = json.load(f)
 
             extracted_data = set()
@@ -247,7 +263,7 @@ def run_code(choice, headers=None):
                 ))
 
             folder_name = "csv"
-            file_name = f"{school_id}_开设专业.csv"
+            file_name = f"学校ID-{school_id}_开设专业.csv"
             folder_path = os.path.join(os.getcwd(), folder_name)
             file_path = os.path.join(folder_path, file_name)
 
@@ -265,15 +281,21 @@ def run_code(choice, headers=None):
         clear_screen()
         # 更新学校id
         url = 'https://static-data.gaokao.cn/www/2.0/school/school_code.json'
-        local_filename = 'json/school_id.json'
+        local_filename = 'source/school_id.json'
+
+        if not os.path.exists('source'):
+            os.makedirs('source')
 
         headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
         download_file(url, local_filename, headers=headers)
 
-        with open('json/school_id.json', 'r', encoding='utf-8') as file:
+        with open('source/school_id.json', 'r', encoding='utf-8') as file:
             json_string = file.read()
 
         parsed_data = json.loads(json_string)
+
+        if not os.path.exists('csv'):
+            os.makedirs('csv')
 
         with open('csv/school_id.csv', mode='w', newline='', encoding='utf-8-sig') as csv_file:
             writer = csv.writer(csv_file)
@@ -284,7 +306,7 @@ def run_code(choice, headers=None):
                 name = value["name"]
                 writer.writerow([name, school_id])
 
-        print(f"数据已成功保存到csv文件夹中。")
+        print(f"数据已成功保存到csv文件夹中，文件名为：school_id.csv。")
         input("按 Enter 键继续...")
 
     elif choice == 0:
@@ -295,16 +317,17 @@ def run_code(choice, headers=None):
 def main():    
     while True:
         clear_screen()
-        print("请选择要运行的代码段：")
-        print("1. 查询各省分数线")
-        print("2. 查询专业分数线")
-        print("3. 查询招生计划")
-        print("4. 查询开设专业")
-        print("9. 更新学校id（默认不需要执行）")
-        print("0. 退出")
+        print("请输入要查询的选项\033[91m（本脚本适合重庆考生，其他省市区须修改相应代码使用）：\033[0m")
+        print("\033[92m1. 查询各省分数线\033[0m")
+        print("\033[92m2. 查询专业分数线\033[0m")
+        print("\033[92m3. 查询招生计划\033[0m")
+        print("\033[92m4. 查询开设专业\033[0m")
+        print("===============================")
+        print("\033[94m9. 更新学校id（默认不需要执行）\033[0m")
+        print("\033[91m0. 退出\033[0m")
         
         try:
-            choice = input("请输入有效数字（参见提示）：")
+            choice = input("请输入有效选项数字：")
             if choice == "":
                 print("输入不能为空，请重新输入！")
                 continue

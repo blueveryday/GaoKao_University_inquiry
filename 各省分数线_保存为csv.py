@@ -1,4 +1,4 @@
-import json
+﻿import json
 import requests
 import csv
 import os
@@ -17,8 +17,8 @@ def download_file(url, local_filename):
 
 # 人机交互式输入 school_id 和 year 数据
 local_province_id = input("请输入新高考的省市区代码（渝:50，其他可以查看Province_ID.txt）: ")
-local_type_id = input("请输入文理科代码（2073代表理科，2074代表文科（大类招生））: ")
-school_id = input("请输入学校ID（比如东南大学:109,北京理工大学:143）: ")
+local_type_id = input("请输入文理科代码（2073代表物理类，2074代表历史类）")
+school_id = input("请输入学校ID（比如清华大学:140）: ")
 year = input("请输入录取年份: ")
 
 # 定义要下载的文件URL和本地保存路径
@@ -35,23 +35,28 @@ parameters = {
     'year': year
 }
 url = base_url + '&'.join([f"{key}={value}" for key, value in parameters.items()])
-local_filename = 'json/gsfsx.json'
+local_folder = 'source'
+local_filename = os.path.join(local_folder, 'gsfsx.json')
+
+# 创建保存 JSON 文件的文件夹
+if not os.path.exists(local_folder):
+    os.makedirs(local_folder)
+
+# 下载文件
+download_file(url, local_filename)
+
+# 读取 JSON 文件
+with open(local_filename, encoding='utf-8') as f:
+    data = json.loads(f.read())
+    items = data['data']['item']
 
 # 创建保存 CSV 文件的文件夹
 csv_folder = 'csv'
 if not os.path.exists(csv_folder):
     os.makedirs(csv_folder)
 
-# 下载文件
-download_file(url, local_filename)
-
-# 读取 JSON 文件
-with open('json/gsfsx.json') as f:
-    data = json.load(f)
-    items = data['data']['item']
-
 # 定义CSV文件路径
-csv_file_path = f"{csv_folder}/{school_id}_{year}_各省分数线.csv"
+csv_file_path = os.path.join(csv_folder, f"学校ID-{school_id}_{items[0]['name']}_{items[0]['local_province_name']}_{year}_各省分数线.csv")
 
 # 写入CSV文件
 with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file:
@@ -66,7 +71,7 @@ with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file
         local_type_name = item['local_type_name']           #文理科
         local_batch_name = item['local_batch_name']         #录取批次
         zslx_name = item['zslx_name']                       #招生类型
-        min = item['min']                                   #最低分    
+        min_score = item['min']                             #最低分    
         min_section = item['min_section']                   #最低位次
         proscore = item['proscore']                         #省控线
         province_name = item['province_name']               #学校所在省份
@@ -75,6 +80,7 @@ with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file
         nature_name = item['nature_name']                   #办学属性
         dual_class_name = item['dual_class_name']           #是否双一流
         # 写入CSV文件
-        writer.writerow([name, year, local_province_name, local_type_name, local_batch_name, zslx_name, min, min_section, proscore, province_name, city_name, county_name, nature_name, dual_class_name])
+        writer.writerow([name, year, local_province_name, local_type_name, local_batch_name, zslx_name, min_score, min_section, proscore, province_name, city_name, county_name, nature_name, dual_class_name])
 
 print(f"数据已成功保存到 {csv_file_path} 文件中。")
+

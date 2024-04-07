@@ -11,6 +11,16 @@ headers = {
 # 获取用户输入的学校ID
 school_id = input("请输入学校ID(比如清华大学为：140): ")
 
+# 定义文件夹路径和文件名
+folder_name = "source"
+file_name = "pc_special.json"
+folder_path = os.path.join(os.getcwd(), folder_name)
+file_path = os.path.join(folder_path, file_name)
+
+# 创建文件夹
+if not os.path.exists(folder_path):
+    os.makedirs(folder_path)
+
 # 下载 JSON 文件
 url = f"https://static-data.gaokao.cn/www/2.0/school/{school_id}/pc_special.json"
 response = requests.get(url, headers=headers)
@@ -18,12 +28,12 @@ response = requests.get(url, headers=headers)
 # 检查请求是否成功
 if response.status_code == 200:
     # 将 JSON 内容写入本地文件
-    with open('json/pc_special.json', 'w') as f:
+    with open(file_path, 'w') as f:
         f.write(response.text)
     print("JSON 文件已成功下载并保存。")
 
     # 读取 JSON 文件
-    with open('json/pc_special.json') as f:
+    with open(file_path) as f:
         data = json.load(f)
 
     # 提取所需字段并保存为列表
@@ -76,7 +86,7 @@ if response.status_code == 200:
 
     # 生成文件夹名称和文件名
     folder_name = "csv"
-    file_name = f"{school_id}_开设专业.csv"
+    file_name = f"学校ID-{school_id}_开设专业.csv"
     folder_path = os.path.join(os.getcwd(), folder_name)
     file_path = os.path.join(folder_path, file_name)
 
@@ -91,3 +101,5 @@ if response.status_code == 200:
          writer.writerows(extracted_data)
 
     print(f"数据已成功保存到 {file_path} 文件中。")
+else:
+    print("请求失败。")

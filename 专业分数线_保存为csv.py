@@ -1,6 +1,7 @@
 import json
 import requests
 import csv
+import os
 
 def download_file(url, local_filename):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
@@ -16,8 +17,8 @@ def download_file(url, local_filename):
 
 # 人机交互式输入 school_id 和 year 数据
 local_province_id = input("请输入新高考的省市区代码（渝:50，其他可以查看Province_ID.txt）: ")
-local_type_id = input("请输入文理科代码（2073代表理科，2074代表文科（大类招生））: ")
-school_id = input("请输入学校ID（比如东南大学:109,北京理工大学:143）: ")
+local_type_id = input("请输入文理科代码（2073代表物理类，2074代表历史类）")
+school_id = input("请输入学校ID（比如清华大学:140）: ")
 year = input("请输入录取年份: ")
 
 # 定义要下载的文件URL和本地保存路径
@@ -34,18 +35,28 @@ parameters = {
     'year': year                                 #录取年份
 }
 url = base_url + '&'.join([f"{key}={value}" for key, value in parameters.items()])
-local_filename = 'json/zyfsx.json'
+local_folder = 'source'
+local_filename = os.path.join(local_folder, 'zyfsx.json')
+
+# 创建保存 JSON 文件的文件夹
+if not os.path.exists(local_folder):
+    os.makedirs(local_folder)
 
 # 下载文件
 download_file(url, local_filename)
 
 # 读取 JSON 文件
-with open('json/zyfsx.json') as f:
-    data = json.load(f)
+with open(local_filename, encoding='utf-8') as f:
+    data = json.loads(f.read())
     items = data['data']['item']
 
+# 创建保存 CSV 文件的文件夹
+csv_folder = 'csv'
+if not os.path.exists(csv_folder):
+    os.makedirs(csv_folder)
+
 # 定义要保存的 CSV 文件路径
-csv_file_path = f"csv/{school_id}_{year}_专业分数线.csv"
+csv_file_path = os.path.join(csv_folder, f"学校ID-{school_id}_{items[0]['name']}_{items[0]['local_province_name']}_{year}_专业分数线.csv")
 
 # 打开 CSV 文件并写入数据
 with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file:

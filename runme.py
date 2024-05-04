@@ -3,6 +3,9 @@ import requests
 import csv
 import os
 import platform
+import sys
+import colorama
+from colorama import Fore, Style
 
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
@@ -16,15 +19,16 @@ def download_file(url, local_filename):
                 if chunk:
                     f.write(chunk)
 
-def run_code(choice):    
+def run_code(choice):  
+    global local_province_id, local_type_id, school_id, total_pages, year  
     if choice == 1:
         clear_screen()
         # 各省分数线
         # 人机交互式输入 school_id 和 year 数据
-        local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
-        local_type_id = input("\033[92m请输入文理科代码\033[91m(2073代表物理类，2074代表历史类)\033[0m:")
-        school_id = input("\033[92m请输入学校ID\033[91m(比如清华大学:140)\033[0m:")
-        year = input("\033[92m请输入录取年份\033[0m: ")
+        #local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
+        #local_type_id = input("\033[92m请输入文理科代码\033[91m(2073代表物理类，2074代表历史类)\033[0m:")
+        #school_id = input("\033[92m请输入学校ID\033[91m(比如清华大学:140)\033[0m:")
+        #year = input("\033[92m请输入录取年份\033[0m: ")
 
         # 定义要下载的文件URL和本地保存路径
         # 地址实例:https://api.zjzw.cn/web/api/?e_sort=zslx_rank,mine_sorttype=desc,desc&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&uri=apidata/api/gk/score/province&year=2023
@@ -41,7 +45,7 @@ def run_code(choice):
         }
         url = base_url + '&'.join([f"{key}={value}" for key, value in parameters.items()])
         local_folder = 'download'
-        local_filename = os.path.join(local_folder, 'gsfsx.json')
+        local_filename = os.path.join(local_folder, f'gsfsx_{school_id}_{year}.json')
 
         # 创建保存 JSON 文件的文件夹
         if not os.path.exists(local_folder):
@@ -99,11 +103,11 @@ def run_code(choice):
         clear_screen()
         # 专业分数线
         # 人机交互式输入 school_id 和 year 数据
-        local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
-        local_type_id = input("\033[92m请输入文理科代码\033[91m(2073代表物理类，2074代表历史类)\033[0m:")
-        school_id = input("\033[92m请输入学校ID\033[91m(比如清华大学:140)\033[0m:")
-        total_pages = int(input("\033[92m请输入专业分数线的总页数\033[91m(输入前请从学校的主页查询)\033[0m:"))  # 输入总页数
-        year = input("\033[92m请输入录取年份\033[0m:")
+        #local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
+        #local_type_id = input("\033[92m请输入文理科代码\033[91m(2073代表物理类，2074代表历史类)\033[0m:")
+        #school_id = input("\033[92m请输入学校ID\033[91m(比如清华大学:140)\033[0m:")
+        #total_pages = int(input("\033[92m请输入专业分数线的总页数\033[91m(输入前请从学校的主页查询)\033[0m:"))  # 输入总页数
+        #year = input("\033[92m请输入录取年份\033[0m:")
 
         # 创建保存 CSV 文件的文件夹
         csv_folder = 'csv'
@@ -133,7 +137,7 @@ def run_code(choice):
             }
             url = base_url + '&'.join([f"{key}={value}" for key, value in parameters.items()])
             local_folder = 'download'
-            local_filename = os.path.join(local_folder, f'zyfsx_{page_id}.json')
+            local_filename = os.path.join(local_folder, f'zyfsx_{school_id}_{year}_{page_id}.json')
 
             # 创建保存 JSON 文件的文件夹
             if not os.path.exists(local_folder):
@@ -188,11 +192,11 @@ def run_code(choice):
         clear_screen()
         # 查询招生计划
         # 人机交互式输入 school_id 和 year 数据
-        local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
-        local_type_id = input("\033[92m请输入文理科代码\033[91m(2073代表物理类，2074代表历史类)\033[0m:")
-        school_id = input("\033[92m请输入学校ID\033[91m(比如清华大学:140)\033[0m:")
-        total_pages = int(input("\033[92m请输入招生计划的总页数\033[91m(输入前请从学校的主页查询)\033[0m:"))  # 输入总页数
-        year = input("\033[92m请输入录取年份\033[0m:")
+        #local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
+        #local_type_id = input("\033[92m请输入文理科代码\033[91m(2073代表物理类，2074代表历史类)\033[0m:")
+        #school_id = input("\033[92m请输入学校ID\033[91m(比如清华大学:140)\033[0m:")
+        #total_pages = int(input("\033[92m请输入招生计划的总页数\033[91m(输入前请从学校的主页查询)\033[0m:"))  # 输入总页数
+        #year = input("\033[92m请输入录取年份\033[0m:")
 
         # 查询省市区代码对应的省份名称
         src_folder = "src"
@@ -299,8 +303,8 @@ def run_code(choice):
         }
 
         # 获取用户输入的学校ID和省市区代码
-        school_id = input("\033[92m请输入学校ID\033[91m(比如清华大学为:140)\033[0m:")
-        local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
+        #school_id = input("\033[92m请输入学校ID\033[91m(比如清华大学为:140)\033[0m:")
+        #local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
 
         # 读取 school_id.csv 文件获取学校名称
         src_folder = "src"
@@ -343,7 +347,7 @@ def run_code(choice):
         url = f"https://static-data.gaokao.cn/www/2.0/school/{school_id}/pc_special.json"
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
-            json_file_path = os.path.join(download_folder_path, f"{school_id}_pc_special.json")
+            json_file_path = os.path.join(download_folder_path, f"pc_special_{school_id}_{year}.json")
             with open(json_file_path, 'w', encoding='utf-8') as json_file:
                 json_file.write(response.text)
         else:
@@ -485,18 +489,37 @@ def run_code(choice):
     else:
         print("你的输入有误，请重新输入正确选项！")
 
-def main():    
+local_province_id = "50"
+local_type_id = "2073"
+school_id = "109"
+total_pages = 3
+year = "2023"
+
+def main():
+    global local_province_id, local_type_id, school_id, total_pages, year
+    colorama.init(autoreset=True)  # 初始化colorama库
+    
+    # 获取用户输入，如果为空则使用默认值
+    local_province_id = input(Fore.GREEN + "请输入新高考的省市区代码" + Fore.RED + "(默认：渝50，其他可以查看province_id.csv)" + Style.RESET_ALL + ":") or local_province_id
+    local_type_id = input(Fore.GREEN + "请输入文理科代码" + Fore.RED + "(默认：2073，2073代表物理类，2074代表历史类)" + Style.RESET_ALL + ":") or local_type_id
+    school_id = input(Fore.GREEN + "请输入学校ID" + Fore.RED + "(默认：东南大学109)" + Style.RESET_ALL + ":") or school_id
+    total_pages = int(input(Fore.GREEN + "请输入总页数(默认：3)" + Fore.RED + "(输入前请从学校的主页查询)" + Style.RESET_ALL + ":") or total_pages)
+    year = input(Fore.GREEN + "请输入录取年份(默认：2023)" + Style.RESET_ALL + ": ") or year
+    
     while True:
         clear_screen()
-        print("请输入要查询的选项\033[91m(本脚本适合重庆考生，其他省市区须修改相应代码使用)\033[0m:")
-        print("\033[92m1. 查询各省分数线\033[0m")
-        print("\033[92m2. 查询专业分数线\033[0m")
-        print("\033[92m3. 查询招生计划\033[0m")
-        print("\033[92m4. 查询开设专业\033[0m")
-        print("===============================")
-        print("\033[94m8. 清空download文件夹\033[0m")
-        print("\033[94m9. 更新学校id(默认不需要执行)\033[0m")
-        print("\033[91m0. 退出\033[0m")
+        print("请输入要查询的选项" + Fore.RED + "(本脚本适合重庆考生，其他省市区须修改相应代码使用)" + Style.RESET_ALL + ":")
+        print(Fore.GREEN + "1. 查询各省分数线")
+        print(Fore.GREEN + "2. 查询专业分数线")
+        print(Fore.GREEN + "3. 查询招生计划")
+        print(Fore.GREEN + "4. 查询开设专业")
+        print("=====================================================================")
+        print(Fore.GREEN + "5. 一键获取学校全部信息")
+        print(Fore.GREEN + "6. 重新输入省市区代码、文理科代码、学校ID、总页数、录取年份等参数")
+        print("=====================================================================")
+        print(Fore.CYAN + "8. 清空download文件夹")
+        print(Fore.CYAN + "9. 更新学校id(默认不需要执行)")
+        print(Fore.RED + "0. 退出" + Style.RESET_ALL)
         
         try:
             choice = input("请输入有效选项数字:")
@@ -504,9 +527,25 @@ def main():
                 print("输入不能为空，请重新输入！")
                 continue
             choice = int(choice)
-            run_code(choice)
-            if choice == 0:
+            
+            if choice == 5:
+                run_code(1)
+                run_code(2)
+                run_code(3)
+                run_code(4)
+                print("全部查询已完成，按 Enter 键返回主选项界面...")
+                input()
+            elif choice == 6:
+                local_province_id = input(Fore.GREEN + "请输入新高考的省市区代码" + Fore.RED + "(渝:50，其他可以查看Province_ID.txt)" + Style.RESET_ALL + ":")
+                local_type_id = input(Fore.GREEN + "请输入文理科代码" + Fore.RED + "(2073代表物理类，2074代表历史类)" + Style.RESET_ALL + ":")
+                school_id = input(Fore.GREEN + "请输入学校ID" + Fore.RED + "(比如清华大学:140)" + Style.RESET_ALL + ":")
+                total_pages = int(input(Fore.GREEN + "请输入总页数" + Fore.RED + "(输入前请从学校的主页查询)" + Style.RESET_ALL + ":"))
+                year = input(Fore.GREEN + "请输入录取年份" + Style.RESET_ALL + ": ")
+                continue  # 直接跳过后续的代码，回到循环开始
+            elif choice == 0:
                 break
+            else:
+                run_code(choice)
         except KeyboardInterrupt:
             print("\n你已中断操作，自动退出本程序！")
             break

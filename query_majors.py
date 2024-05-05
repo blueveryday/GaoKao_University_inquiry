@@ -1,4 +1,3 @@
-# 文件名: query_majors.py
 import json
 import requests
 import csv
@@ -64,12 +63,15 @@ def main():
 
     # 定义文件夹路径和文件名
     folder_name = "csv"
-
-    # 创建 download 文件夹
     download_folder = "download"
     download_folder_path = os.path.join(os.getcwd(), download_folder)
-    if not os.path.exists(download_folder_path):
-        os.makedirs(download_folder_path)
+    province_folder = os.path.join(os.getcwd(), folder_name, province_name)
+    school_subfolder = os.path.join(province_folder, school_name)
+
+    # 创建文件夹
+    os.makedirs(province_folder, exist_ok=True)
+    os.makedirs(school_subfolder, exist_ok=True)
+    os.makedirs(download_folder_path, exist_ok=True)
 
     # 下载 JSON 文件并保存到 download 文件夹中
     # 地址实例:https://static-data.gaokao.cn/www/2.0/school/109/pc_special.json
@@ -147,35 +149,12 @@ def main():
 
         # 定义文件名
         file_name = f"{school_name}_学校代码{school_id}_{province_name}{local_province_id}_{first_year}_开设专业.csv"
-        folder_path = os.path.join(os.getcwd(), folder_name)
-        file_path = os.path.join(folder_path, file_name)
-
-        # 创建文件夹
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-
-        # 创建子文件夹以第一个变量值命名
-        subfolder_name = file_name.split('_')[0]  # 提取文件名的第一个变量值
-        subfolder_path = os.path.join(folder_path, subfolder_name)
-        if not os.path.exists(subfolder_path):
-            os.makedirs(subfolder_path)
-
-        # 定义完整的文件路径
-        file_path = os.path.join(subfolder_path, file_name)
+        file_path = os.path.join(school_subfolder, file_name)
 
         # 将数据写入 CSV 文件
         with open(file_path, mode='w', newline='', encoding='utf-8-sig') as file:
-            writer = csv.writer(file)
-            writer.writerow(['学校ID',
-                             '专业名称',
-                             '层次',
-                             '学科门类',
-                             '专业类别',
-                             '学制',
-                             '学科等级',
-                             '国家特色专业',
-                             '招生年份'])  # 写入表头
-            writer.writerows(extracted_data)
+            csv.writer(file).writerows([['学校ID', '专业名称', '层次', '学科门类', '专业类别', '学制', '学科等级', '国家特色专业', '招生年份']] + list(extracted_data))
+
 
         # print(f"数据已成功保存到 {file_path} 文件中。")
         # #显示文件保存的绝对路径

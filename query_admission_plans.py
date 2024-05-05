@@ -4,8 +4,10 @@ import requests
 import csv
 import os
 
+
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
+
 
 def download_file(url, local_filename):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
@@ -18,6 +20,7 @@ def download_file(url, local_filename):
 
 def main():
     clear_screen()
+
     # 查询招生计划
     # 人机交互式输入 school_id 和 year 数据
     local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
@@ -75,29 +78,33 @@ def main():
         # 创建保存 JSON 文件的文件夹
         if not os.path.exists(local_folder):
             os.makedirs(local_folder)
-        if not os.path.exists(download_folder):
-            os.makedirs(download_folder)
 
         # 下载文件
         download_file(url, local_filename)
 
         # 读取 JSON 文件
         with open(local_filename, encoding='utf-8') as f:
-            data = json.loads(f.read())
+            data = json.load(f)
             items = data['data']['item']
             all_items.extend(items)
 
-    # 获取第一个项目的名称
-    first_item_name = all_items[0]['name']
+    # 获取第一个项目的名称和文理科
+    first_item = all_items[0]
+    first_item_name = first_item['name']
+    local_type_name = first_item['local_type_name']
 
     # 创建子文件夹
     subfolder_name = first_item_name
-    subfolder_path = os.path.join(csv_folder, subfolder_name)
-    if not os.path.exists(subfolder_path):
-        os.makedirs(subfolder_path)
+    province_folder_path = os.path.join(csv_folder, province_name)
+    school_folder_path = os.path.join(province_folder_path, subfolder_name)
+    type_folder_path = os.path.join(school_folder_path, local_type_name)
+
+    for folder_path in [province_folder_path, school_folder_path, type_folder_path]:
+        if not os.path.exists(folder_path):
+            os.makedirs(folder_path)
 
     # 定义CSV文件路径
-    csv_file_path = os.path.join(subfolder_path, f"{first_item_name}_学校代码{school_id}_{province_name}{local_province_id}_{year}_招生计划.csv")
+    csv_file_path = os.path.join(type_folder_path, f"{first_item_name}_学校代码{school_id}_{local_type_name}_{province_name}{local_province_id}_{year}_招生计划.csv")
 
     # 打开 CSV 文件并写入数据
     with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file:
@@ -123,6 +130,7 @@ def main():
 
     print(f"数据已成功保存到 {csv_file_path} 文件中。")
     input("按 Enter 键继续...")
+
 
 if __name__ == "__main__":
     main()

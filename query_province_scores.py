@@ -1,13 +1,10 @@
-# 文件名: query_province_scores.py
 import json
 import requests
 import csv
 import os
 
-
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
-
 
 def download_file(url, local_filename):
     headers = {
@@ -19,7 +16,6 @@ def download_file(url, local_filename):
             for chunk in response.iter_content(chunk_size=819200):
                 if chunk:
                     f.write(chunk)
-
 
 def main():
     clear_screen()
@@ -45,7 +41,7 @@ def main():
     url = base_url + \
         '&'.join([f"{key}={value}" for key, value in parameters.items()])
     local_folder = 'download'
-    local_filename = os.path.join(local_folder, 'gsfsx.json')
+    local_filename = os.path.join(local_folder, f"gsfsx_{school_id}_{local_type_id}.json")
 
     # 创建保存 JSON 文件的文件夹
     if not os.path.exists(local_folder):
@@ -61,37 +57,23 @@ def main():
 
     # 创建保存 CSV 文件的文件夹
     csv_folder = 'csv'
-    if not os.path.exists(csv_folder):
-        os.makedirs(csv_folder)
-
-    # 创建子文件夹
-    subfolder_name = items[0]['name']
-    subfolder_path = os.path.join(csv_folder, subfolder_name)
-    if not os.path.exists(subfolder_path):
-        os.makedirs(subfolder_path)
+    school_name = items[0]['name']
+    province_name = items[0]['local_province_name']
+    local_type_name = items[0]['local_type_name']
+    school_folder_path = os.path.join(csv_folder, province_name, school_name, local_type_name)
+    if not os.path.exists(school_folder_path):
+        os.makedirs(school_folder_path)
 
     # 定义CSV文件路径
     csv_file_path = os.path.join(
-        subfolder_path, f"{items[0]['name']}_学校代码{school_id}_{items[0]['local_province_name']}{local_province_id}_{year}_各省分数线.csv")
+        school_folder_path, f"{school_name}_学校代码{school_id}_{local_type_name}_{province_name}{local_province_id}_{year}_各省分数线.csv")
 
     # 写入CSV文件
     with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file:
         writer = csv.writer(csv_file)
         # 写入表头
-        writer.writerow(["学校名称",
-                         "招生年份",
-                         "省市区",
-                         "文理科",
-                         "录取批次",
-                         "招生类型",
-                         "最低分",
-                         "最低位次",
-                         "省控线",
-                         "学校所在省份",
-                         "学校所在城市",
-                         "学校所在区县 ",
-                         "办学属性",
-                         "是否双一流"])
+        writer.writerow(["学校名称", "招生年份", "省市区", "文理科", "录取批次", "招生类型", "最低分", "最低位次", "省控线", "学校所在省份", "学校所在城市", "学校所在区县", "办学属性", "是否双一流"])
+
         # 提取信息并写入CSV文件
         for item in items:
             name = item['name']  # 学校名称
@@ -109,24 +91,10 @@ def main():
             nature_name = item['nature_name']  # 办学属性
             dual_class_name = item['dual_class_name']  # 是否双一流
             # 写入CSV文件
-            writer.writerow([name,
-                             year,
-                             local_province_name,
-                             local_type_name,
-                             local_batch_name,
-                             zslx_name,
-                             min_score,
-                             min_section,
-                             proscore,
-                             province_name,
-                             city_name,
-                             county_name,
-                             nature_name,
-                             dual_class_name])
+            writer.writerow([name, year, local_province_name, local_type_name, local_batch_name, zslx_name, min_score, min_section, proscore, province_name, city_name, county_name, nature_name, dual_class_name])
 
     print(f"数据已成功保存到 {csv_file_path} 文件中。")
     input("按 Enter 键继续...")
-
 
 if __name__ == "__main__":
     main()

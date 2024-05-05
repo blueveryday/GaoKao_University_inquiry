@@ -123,6 +123,7 @@ def run_code(choice):
         # 循环处理每一页
         for page_id in range(1, total_pages + 1):
             # 定义要下载的文件URL和本地保存路径
+            # 地址实例:https://api.zjzw.cn/web/api/?local_batch_id=14&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&special_group=&uri=apidata/api/gk/score/special&year=2023
             base_url = 'https://api.zjzw.cn/web/api/?'
             parameters = {
                 'local_batch_id': '14',                      # 录取批次
@@ -227,6 +228,7 @@ def run_code(choice):
         # 循环处理每一页
         for page_id in range(1, total_pages + 1):
             # 定义要下载的文件URL和本地保存路径
+            # 地址实例:https://api.zjzw.cn/web/api/?local_batch_id=14&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&special_group=&uri=apidata/api/gkv3/plan/school&year=2023
             base_url = 'https://api.zjzw.cn/web/api/?'
             parameters = {
                 'local_batch_id': '14',                      # 录取批次
@@ -344,6 +346,7 @@ def run_code(choice):
             os.makedirs(download_folder_path)
 
         # 下载 JSON 文件并保存到 download 文件夹中
+        # 地址实例:https://static-data.gaokao.cn/www/2.0/school/109/pc_special.json
         url = f"https://static-data.gaokao.cn/www/2.0/school/{school_id}/pc_special.json"
         response = requests.get(url, headers=headers)
         if response.status_code == 200:
@@ -503,8 +506,8 @@ def main():
     local_province_id = input(Fore.GREEN + "请输入新高考的省市区代码" + Fore.RED + "(默认：渝50，其他可以查看province_id.csv)" + Style.RESET_ALL + ":") or local_province_id
     local_type_id = input(Fore.GREEN + "请输入文理科代码" + Fore.RED + "(默认：2073，2073代表物理类，2074代表历史类)" + Style.RESET_ALL + ":") or local_type_id
     school_id = input(Fore.GREEN + "请输入学校ID" + Fore.RED + "(默认：东南大学109)" + Style.RESET_ALL + ":") or school_id
-    total_pages = int(input(Fore.GREEN + "请输入总页数(默认：3)" + Fore.RED + "(输入前请从学校的主页查询)" + Style.RESET_ALL + ":") or total_pages)
-    year = input(Fore.GREEN + "请输入录取年份(默认：2023)" + Style.RESET_ALL + ": ") or year
+    total_pages = int(input(Fore.GREEN + "请输入总页数" + Fore.RED + "(默认：3，输入前请从学校的主页查询)" + Style.RESET_ALL + ":") or total_pages)
+    year = input(Fore.GREEN + "请输入录取年份" + Fore.RED + "(默认：2023)" + Style.RESET_ALL + ": ") or year
     
     while True:
         clear_screen()
@@ -515,7 +518,7 @@ def main():
         print(Fore.GREEN + "4. 查询开设专业")
         print("=====================================================================")
         print(Fore.GREEN + "5. 一键获取学校全部信息")
-        print(Fore.GREEN + "6. 重新输入省市区代码、文理科代码、学校ID、总页数、录取年份等参数")
+        print(Fore.RED + "6. 重新定义省市区代码、文理科代码、学校ID、总页数、录取年份等参数")
         print("=====================================================================")
         print(Fore.CYAN + "8. 清空download文件夹")
         print(Fore.CYAN + "9. 更新学校id(默认不需要执行)")

@@ -46,6 +46,7 @@ def main():
     # 循环处理每一页
     for page_id in range(1, total_pages + 1):
         # 定义要下载的文件URL和本地保存路径
+        # 地址实例:https://api.zjzw.cn/web/api/?local_batch_id=14&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&special_group=&uri=apidata/api/gk/score/special&year=2023
         base_url = 'https://api.zjzw.cn/web/api/?'
         parameters = {
             'local_batch_id': '14',                      # 录取批次

@@ -72,6 +72,7 @@ def main():
         os.makedirs(download_folder_path)
 
     # 下载 JSON 文件并保存到 download 文件夹中
+    # 地址实例:https://static-data.gaokao.cn/www/2.0/school/109/pc_special.json
     url = f"https://static-data.gaokao.cn/www/2.0/school/{school_id}/pc_special.json"
     response = requests.get(url, headers=headers)
     if response.status_code == 200:

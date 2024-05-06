@@ -23,11 +23,11 @@ def main():
 
     # 查询招生计划
     # 人机交互式输入 school_id 和 year 数据
-    local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
-    local_type_id = input("\033[92m请输入文理科代码\033[91m(2073代表物理类，2074代表历史类)\033[0m:")
-    school_id = input("\033[92m请输入学校ID\033[91m(比如清华大学:140)\033[0m:")
-    total_pages = int(input("\033[92m请输入招生计划的总页数\033[91m(输入前请从学校的主页查询)\033[0m:"))  # 输入总页数
-    year = input("\033[92m请输入录取年份\033[0m:")
+    local_province_id = input("\033[92m ※ 请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
+    local_type_id = input("\033[92m ※ 请输入文理科代码\033[91m(2073代表物理类，2074代表历史类)\033[0m:")
+    school_id = input("\033[92m ※ 请输入学校ID\033[91m(比如清华大学:140)\033[0m:")
+    total_pages = int(input("\033[92m ※ 请输入招生计划的总页数\033[91m(输入前请从学校的主页查询)\033[0m:"))  # 输入总页数
+    year = input("\033[92m ※ 请输入录取年份\033[0m:")
 
     # 查询省市区代码对应的省份名称
     src_folder = "src"
@@ -73,7 +73,7 @@ def main():
         }
         url = base_url + '&'.join([f"{key}={value}" for key, value in parameters.items()])
         local_folder = 'download'
-        local_filename = os.path.join(local_folder, f'zyfsx_{school_id}_{year}_{page_id}.json')
+        local_filename = os.path.join(local_folder, f'招生计划_{school_id}_{year}_{page_id}.json')
 
         # 创建保存 JSON 文件的文件夹
         if not os.path.exists(local_folder):

@@ -10,6 +10,7 @@ def download_file(url, local_filename):
     headers = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
     }
+
     with requests.get(url, stream=True, headers=headers) as response:
         response.raise_for_status()
         with open(local_filename, 'wb') as f:
@@ -20,10 +21,10 @@ def download_file(url, local_filename):
 def main():
     clear_screen()
     # 人机交互式输入 school_id 和 year 数据
-    local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
-    local_type_id = input("\033[92m请输入文理科代码\033[91m(2073代表物理类，2074代表历史类)\033[0m:")
-    school_id = input("\033[92m请输入学校ID\033[91m(比如清华大学:140)\033[0m:")
-    year = input("\033[92m请输入录取年份\033[0m: ")
+    local_province_id = input("\033[92m ※ 请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
+    local_type_id = input("\033[92m ※ 请输入文理科代码\033[91m(2073代表物理类，2074代表历史类)\033[0m:")
+    school_id = input("\033[92m ※ 请输入学校ID\033[91m(比如清华大学:140)\033[0m:")
+    year = input("\033[92m ※ 请输入录取年份\033[0m: ")
 
     # 定义要下载的文件URL和本地保存路径
     # 地址实例:https://api.zjzw.cn/web/api/?e_sort=zslx_rank,mine_sorttype=desc,desc&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&uri=apidata/api/gk/score/province&year=2023
@@ -41,7 +42,7 @@ def main():
     url = base_url + \
         '&'.join([f"{key}={value}" for key, value in parameters.items()])
     local_folder = 'download'
-    local_filename = os.path.join(local_folder, f"gsfsx_{school_id}_{local_type_id}.json")
+    local_filename = os.path.join(local_folder, f"院校分数线_{school_id}_{local_type_id}.json")
 
     # 创建保存 JSON 文件的文件夹
     if not os.path.exists(local_folder):
@@ -66,7 +67,7 @@ def main():
 
     # 定义CSV文件路径
     csv_file_path = os.path.join(
-        school_folder_path, f"{school_name}_学校代码{school_id}_{local_type_name}_{province_name}{local_province_id}_{year}_各省分数线.csv")
+        school_folder_path, f"{school_name}_学校代码{school_id}_{local_type_name}_{province_name}{local_province_id}_{year}_院校分数线.csv")
 
     # 写入CSV文件
     with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file:

@@ -28,8 +28,8 @@ def main():
     }
 
     # 获取用户输入的学校ID和省市区代码
-    school_id = input("\033[92m请输入学校ID\033[91m(比如清华大学为:140)\033[0m:")
-    local_province_id = input("\033[92m请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
+    school_id = input("\033[92m ※ 请输入学校ID\033[91m(比如清华大学为:140)\033[0m:")
+    local_province_id = input("\033[92m ※ 请输入新高考的省市区代码\033[91m(渝:50，其他可以查看Province_ID.txt)\033[0m:")
 
     # 读取 school_id.csv 文件获取学校名称
     src_folder = "src"
@@ -79,7 +79,7 @@ def main():
     response = requests.get(url, headers=headers)
     if response.status_code == 200:
         json_file_path = os.path.join(
-            download_folder_path, f"{school_id}_pc_special.json")
+            download_folder_path, f"开设专业_{school_id}_pc_special.json")
         with open(json_file_path, 'w', encoding='utf-8') as json_file:
             json_file.write(response.text)
     else:

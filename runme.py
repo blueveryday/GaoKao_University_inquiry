@@ -4,6 +4,7 @@ import csv
 import os
 import platform
 import sys
+import pandas as pd
 import colorama
 from colorama import Fore, Style
 
@@ -442,17 +443,38 @@ def run_code(choice):
             print("请求失败。")
             
         input("按 Enter 键继续...") 
+    elif choice == 5:
+        clear_screen()
+        # 一键获取学校全部信息
+        run_code(1)
+        run_code(2)
+        run_code(3)
+        run_code(4)
+        input("\n全部查询已完成，按 Enter 键继续...")
+    elif choice == 6:
+        clear_screen()
+        # 查询省市区代码或学校ID号
+        search_menu()
+    elif choice == 7:
+        clear_screen()
+        # 重新定义省市区代码、文理科代码、学校ID、总页数、录取年份等参数
+        local_province_id = input(Fore.GREEN + " ※ 请输入新高考的省市区代码" + Fore.RED + "(默认：渝50，其他可以查看province_id.csv)" + Style.RESET_ALL + ":") or local_province_id
+        local_type_id = input(Fore.GREEN + " ※ 请输入文理科代码" + Fore.RED + "(默认：2073，2073代表物理类，2074代表历史类)" + Style.RESET_ALL + ":") or local_type_id
+        school_id = input(Fore.GREEN + " ※ 请输入学校ID" + Fore.RED + "(默认：东南大学109)" + Style.RESET_ALL + ":") or school_id
+        total_pages = int(input(Fore.GREEN + " ※ 请输入总页数" + Fore.RED + "(默认：3，输入前请从学校的主页查询)" + Style.RESET_ALL + ":") or total_pages)
+        year = input(Fore.GREEN + " ※ 请输入录取年份" + Fore.RED + "(默认：2023)" + Style.RESET_ALL + ": ") or year
     elif choice == 8:
-    # 清空下载文件夹中的全部文件
+        clear_screen()
+        # 清空下载文件夹中的全部文件
         download_folder = 'download'
         if os.path.exists(download_folder):
             for filename in os.listdir(download_folder):
                 file_path = os.path.join(download_folder, filename)
                 if os.path.isfile(file_path):
                     os.remove(file_path)
-            print("\033[91m已清空download文件夹。\033[0m")
+            print("已清空download文件夹")
         else:
-            print("\033[91m下载文件夹不存在。\033[0m")
+            print(Fore.RED + "下载文件夹不存在。\n" + Style.RESET_ALL)
         input("按 Enter 键继续...")    
     elif choice == 9:
         clear_screen()
@@ -495,6 +517,79 @@ school_id = "109"
 total_pages = "3"
 year = "2023"
 
+def search_school_id(csv_file, keyword):
+    try:
+        # 读取CSV文件
+        df = pd.read_csv(csv_file, encoding='utf-8')
+        
+        # 进行模糊查询
+        result = df[df['学校名称'].str.contains(keyword, case=False)]
+        
+        # 重置索引并删除原索引列
+        result = result.reset_index(drop=True)
+
+        # 打印查询结果
+        if not result.empty:
+            print(Fore.RED + "\n查询结果：" + Style.RESET_ALL)  # 将查询结果文字颜色设置为红色
+            # 打印学校名称和学校ID号的标题
+            print(Fore.GREEN + "学校名称".ljust(30) + "学校ID号" + Style.RESET_ALL)
+            
+            # 打印查询结果
+            if not result.empty:
+                for idx, row in result.iterrows():
+                    print(f"{idx:<5}", end="")  # 打印重置后的索引号
+                    print(Fore.GREEN + f"{row['学校名称']:<30}" + Fore.RESET + f"{row['学校ID号']:<10}\n")  # 将学校名称左对齐，学校ID号左对齐，并将学校名称和学校ID号颜色设置为绿色
+        else:
+            input(Fore.RED + "未找到包含关键字的学校名称，按回车键返回...\n" + Style.RESET_ALL)
+            search_menu()  # 返回子菜单
+    except Exception as e:
+        print("程序出现异常：", e)
+
+def search_province_code(csv_file, keyword):
+    try:
+        # 读取CSV文件
+        df = pd.read_csv(csv_file, encoding='utf-8')
+        
+        # 进行模糊查询
+        result = df[df.iloc[:, 0].str.contains(keyword, case=False)]
+        
+        # 重置索引并删除原索引列
+        result = result.reset_index(drop=True)
+        
+        # 打印查询结果
+        if not result.empty:
+            print(Fore.RED + "\n查询结果：" + Style.RESET_ALL)  # 将查询结果文字颜色设置为红色
+            for idx, row in result.iterrows():
+                print(f"{idx:<5}", end="")  # 打印重置后的索引号
+                print(Fore.GREEN + f"{row.iloc[0]:<30}" + Fore.RESET + f"{row.iloc[1]:<10}\n" + Style.RESET_ALL)  # 将省市区名称左对齐，省市区代码左对齐，并将省市区名称和省市区代码颜色设置为绿色
+        else:
+            input(Fore.RED + "未找到包含关键字的省市区名称，按回车键返回...\n" + Style.RESET_ALL)
+            search_menu()  # 返回子菜单
+    except Exception as e:
+        print("程序出现异常：", e)
+
+def search_menu():
+    while True:
+        print("=====================================================================")
+        print("请选择查询类型：")
+        print(Fore.GREEN + " [1] 省市区代码查询" + Style.RESET_ALL)
+        print(Fore.GREEN + " [2] 学校ID号查询\n" + Style.RESET_ALL)
+        print(Fore.RED + " [0] 返回上一级主菜单\n" + Style.RESET_ALL)
+        choice = int(input("请输入选择: "))
+        if choice == 1:
+            csv_file = "src/province_id.csv"
+            keyword = input(Fore.RED + "请输入省市区名称关键字：" + Style.RESET_ALL)
+            search_province_code(csv_file, keyword)
+        elif choice == 2:
+            csv_file = "src/school_id.csv"
+            keyword = input(Fore.RED + "请输入学校名称关键字：" + Style.RESET_ALL)
+            search_school_id(csv_file, keyword)
+        elif choice == 0:
+            break  # 退出循环，返回上一级主界面
+        else:
+            print(Fore.RED + "输入错误，请重新输入正确选项！" + Style.RESET_ALL)
+            continue
+
 def main():
     global local_province_id, local_type_id, school_id, total_pages, year
     colorama.init(autoreset=True)  # 初始化colorama库
@@ -508,19 +603,19 @@ def main():
     
     while True:
         clear_screen()
-        print("请输入要查询的选项" + Fore.RED + "(本脚本适合重庆考生，其他省市区须修改相应代码使用)" + Style.RESET_ALL + ":")
+        print("=====================================================================")
+        print("请输入要查询的选项" + Fore.RED + "(本脚本适合重庆、河北、辽宁、江苏、福建、湖北、湖南、广东考生，其他省市区须修改相应代码使用)" + Style.RESET_ALL + ":")
         print(Fore.GREEN + " [1] 查询各省分数线")
         print(Fore.GREEN + " [2] 查询专业分数线")
         print(Fore.GREEN + " [3] 查询招生计划")
         print(Fore.GREEN + " [4] 查询开设专业")
-        print("=====================================================================")
-        print(Fore.GREEN + " [5] 一键获取学校全部信息")
-        print(Fore.RED + " [6] 重新定义省市区代码、文理科代码、学校ID、总页数、录取年份等参数")
-        print("=====================================================================")
+        print(Fore.GREEN + " [5] 一键查询学校全部信息\n")
+        print(Fore.GREEN + " [6] 查询省市区代码或学校ID号")
+        print(Fore.RED + " [7] 重新定义省市区代码、文理科代码、学校ID、总页数、录取年份等参数\n")
         print(Fore.CYAN + " [8] 清空download文件夹")
-        print(Fore.CYAN + " [9] 更新学校id(默认不需要执行)")
-        print("=====================================================================")
+        print(Fore.CYAN + " [9] 更新学校id(默认不需要执行)\n")
         print(Fore.RED + " [0] 退出" + Style.RESET_ALL)
+        print("=====================================================================\n")
         
         try:
             choice = input("请输入有效选项数字:")
@@ -529,20 +624,7 @@ def main():
                 continue
             choice = int(choice)
             
-            if choice == 5:
-                run_code(1)
-                run_code(2)
-                run_code(3)
-                run_code(4)
-                print("全部查询已完成，按 Enter 键返回主选项界面...")
-                input()
-            elif choice == 6:
-                local_province_id = input(Fore.GREEN + " ※ 请输入新高考的省市区代码" + Fore.RED + "(渝:50，其他可以查看Province_ID.txt)" + Style.RESET_ALL + ":")
-                local_type_id = input(Fore.GREEN + " ※ 请输入文理科代码" + Fore.RED + "(2073代表物理类，2074代表历史类)" + Style.RESET_ALL + ":")
-                school_id = input(Fore.GREEN + " ※ 请输入学校ID" + Fore.RED + "(比如清华大学:140)" + Style.RESET_ALL + ":")
-                total_pages = int(input(Fore.GREEN + " ※ 请输入总页数" + Fore.RED + "(输入前请从学校的主页查询)" + Style.RESET_ALL + ":"))
-                year = input(Fore.GREEN + " ※ 请输入录取年份" + Style.RESET_ALL + ": ")
-            elif choice == 0:
+            if choice == 0:
                 break
             else:
                 run_code(choice)

@@ -5,7 +5,7 @@
 用法：
 linux、windows环境安装Python3，并通过pip3安装requests openpyxl
 
-pip3 install requests openpyxl colorama
+pip3 install requests openpyxl colorama pandas
 
 ubuntu系统，终端下运行：
 python3 runme.py

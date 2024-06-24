@@ -154,7 +154,7 @@ def get_province_name(local_province_id):
     return None
 
 def download_json(year, local_province_id, local_type_id):
-    #https://static-data.gaokao.cn/www/2.0/section2021/{year}/{local_province_id}/3/{local_type_id}/lists.json
+    #https://static-data.gaokao.cn/www/2.0/section2021/2024/50/3/2073/lists.json
     url = f"https://static-data.gaokao.cn/www/2.0/section2021/{year}/{local_province_id}/{local_type_id}/3/lists.json"
     response = requests.get(url)
     if response.status_code == 200:
@@ -198,7 +198,7 @@ def score_ranking_menu():
             print("==============================================")
             print("一分一段查询（同分人数、排名区间等）：\n")
             print(Fore.GREEN + " [1] 通过高考分数查询（一分一段的同分人数、排名区间、累计人数、历史同位次考生得分）\n" + Style.RESET_ALL)
-            print(Fore.GREEN + " [2] 下载2016 - 2023年度的物理类（理科）、历史类（文科）一分一段JSON数据文件\n" + Style.RESET_ALL)
+            print(Fore.GREEN + " [2] 下载2016 - 2024年度的物理类（理科）、历史类（文科）一分一段JSON数据文件\n" + Style.RESET_ALL)
             print(Fore.GREEN + " [3] 生成一分一段EXCEL文件\n" + Style.RESET_ALL)
             print(Fore.RED + " [0] 返回上级菜单" + Style.RESET_ALL)
 
@@ -216,7 +216,7 @@ def score_ranking_menu():
                             break
 
                     while True:
-                        year = input(Fore.GREEN + " ※ 请输入年份" + Fore.RED + "（例如 2016 - 2028之间的年份，默认值为2023）: " + Style.RESET_ALL) or "2023"
+                        year = input(Fore.GREEN + " ※ 请输入年份" + Fore.RED + "（例如 2016 - 2028之间的年份，默认值为2024）: " + Style.RESET_ALL) or "2024"
                         if not year.isdigit() or int(year) not in range(2016, 2028):
                             print(Fore.RED + "错误：请输入2016 - 2028之间的有效年份。" + Style.RESET_ALL)
                             continue
@@ -298,9 +298,9 @@ def score_ranking_menu():
 
             elif choice == '2':
                 while True:
-                    gk_year = input(Fore.GREEN + "\n请输入年份" + Fore.RED + "（2016 - 2028之间的年份，默认值为2023）: " + Style.RESET_ALL) or "2023"
+                    gk_year = input(Fore.GREEN + "\n请输入年份" + Fore.RED + "（2016 - 2028之间的年份，默认值为2024）: " + Style.RESET_ALL) or "2024"
                     if not gk_year:
-                        gk_year = "2023"
+                        gk_year = "2024"
                     elif not gk_year.isdigit() or int(gk_year) not in range(2016, 2028):    # 设置查询的年份值范围最大值可修改
                         print(Fore.RED + "错误：请输入2016 - 2028之间的有效年份。" + Style.RESET_ALL)
                         continue
@@ -339,7 +339,7 @@ def score_ranking_menu():
 
             elif choice == '3':
                 while True:
-                    year = input(Fore.GREEN + " ※ 请输入年份" + Fore.RED + "（例如 2016 - 2028之间的年份，默认值为2023）: " + Style.RESET_ALL) or "2023"
+                    year = input(Fore.GREEN + " ※ 请输入年份" + Fore.RED + "（例如 2016 - 2028之间的年份，默认值为2024）: " + Style.RESET_ALL) or "2024"
                     if not year.isdigit() or int(year) not in range(2016, 2028):
                         print(Fore.RED + "错误：请输入2016 - 2028之间的有效年份。" + Style.RESET_ALL)
                         continue
@@ -1055,7 +1055,7 @@ def run_code(choice):
                     break
                 
             while True:
-                year = input(Fore.GREEN + " ※ 请输入年份" + Fore.RED + "（例如 2016 - 2028之间的年份，默认值为2023）: " + Style.RESET_ALL) or "2023"
+                year = input(Fore.GREEN + " ※ 请输入年份" + Fore.RED + "（例如 2016 - 2028之间的年份，默认值为2024）: " + Style.RESET_ALL) or "2024"
                 if not year.isdigit() or int(year) not in range(2016, 2028):
                     print(Fore.RED + "错误：请输入2016 - 2028之间的有效年份。" + Style.RESET_ALL)
                     continue
@@ -1158,7 +1158,7 @@ def main():
             break
                 
     while True:
-        year = input(Fore.GREEN + " ※ 请输入年份" + Fore.RED + "（例如 2016 - 2028之间的年份，默认值为2023）: " + Style.RESET_ALL) or "2023"
+        year = input(Fore.GREEN + " ※ 请输入年份" + Fore.RED + "（例如 2016 - 2028之间的年份，默认值为2024）: " + Style.RESET_ALL) or "2024"
         if not year.isdigit() or int(year) not in range(2016, 2028):
             print(Fore.RED + "错误：请输入2016 - 2028之间的有效年份。" + Style.RESET_ALL)
             continue

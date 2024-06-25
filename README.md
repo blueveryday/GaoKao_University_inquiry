@@ -24,7 +24,6 @@ windows系统，直接安装python3以后，双击runme.py脚本运行。
 界面：
 
 ![1](https://github.com/blueveryday/GaoKao_University_inquiry/assets/29169337/9309caf8-accd-4035-b506-f2905eaeb2c9)
-![2](https://github.com/blueveryday/GaoKao_University_inquiry/assets/29169337/98bde438-2640-44f1-8899-4281abfac31d)
 ![3](https://github.com/blueveryday/GaoKao_University_inquiry/assets/29169337/fcfcaa20-6fbe-46a2-b62f-566e5a48fab5)
 
 

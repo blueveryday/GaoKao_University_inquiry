@@ -154,7 +154,7 @@ def get_province_name(local_province_id):
     return None
 
 def download_json(year, local_province_id, local_type_id):
-    #https://static-data.gaokao.cn/www/2.0/section2021/2024/50/3/2073/lists.json
+    #https://static-data.gaokao.cn/www/2.0/section2021/2024/50/2073/3/lists.json
     url = f"https://static-data.gaokao.cn/www/2.0/section2021/{year}/{local_province_id}/{local_type_id}/3/lists.json"
     response = requests.get(url)
     if response.status_code == 200:
@@ -1136,6 +1136,35 @@ def run_code(choice):
             print(f"数据已成功保存到src文件夹中，文件名为:school_id.csv。")
             input("按 Enter 键继续...")
             break
+        elif choice == 12:
+            def csv_save_as_xlsx(data_path, output_path):
+                for dirpath, dirnames, filenames in os.walk(data_path):
+                    for fname in filenames:
+                        if fname.endswith('.csv'):
+                            file_name = os.path.join(dirpath, fname)
+                            df = pd.read_csv(file_name)
+                
+                            # 构建新的文件夹路径
+                            relative_path = os.path.relpath(dirpath, data_path)
+                            new_dir = os.path.join(output_path, relative_path)
+                
+                            # 确保目标目录存在
+                            os.makedirs(new_dir, exist_ok=True)
+                
+                            # 构建新文件路径
+                            new_file_path = os.path.join(new_dir, f"{os.path.splitext(fname)[0]}.xlsx")
+                            df.to_excel(new_file_path, index=False)
+                            print(f'{file_name} 转换为 {new_file_path} 成功')
+                            print('==============================================')
+            # 获取当前脚本所在目录
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            # 将 data_path 设置为当前目录下的 csv 文件夹
+            data_path = os.path.join(current_dir, "csv")
+            # 将 output_path 设置为当前目录下的 xlsx 文件夹
+            output_path = os.path.join(current_dir, "xlsx")
+            csv_save_as_xlsx(data_path, output_path) 
+            input("\n转换完成，按 Enter 键继续...")
+            break            
         elif choice == 0:
             return  # Exiting the function, which effectively returns to the main menu
         else:
@@ -1204,7 +1233,8 @@ def main():
         print(Fore.RED + " [8] 重新定义""省市区代码、文理科代码、学校ID、总页数、录取年份等参数\n"+ Style.RESET_ALL)
         print(Fore.GREEN + " [9] 查询一分一段\n")
         print(Fore.CYAN + " [10] 清空download文件夹")
-        print(Fore.CYAN + " [11] 更新学校id(默认不需要执行)\n" + Style.RESET_ALL)
+        print(Fore.CYAN + " [11] 更新学校id(默认不需要执行)\n"+ Style.RESET_ALL)
+        print(Fore.GREEN + " [12] 将CSV文件批量转换成XLSX文件\n" + Style.RESET_ALL)
         print(Fore.RED + " [0] 退出\n" + Style.RESET_ALL)
         print("==============================================\n")
         

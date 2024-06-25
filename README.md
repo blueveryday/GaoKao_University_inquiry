@@ -22,8 +22,9 @@ windows系统，直接安装python3以后，双击runme.py脚本运行。
 的各大学的主页信息。
 
 界面：
-![6c2f8bf157a002d68cdad8d52b0a2bc](https://github.com/blueveryday/GaoKao_University_inquiry/assets/29169337/d4ead63f-454e-49d5-bf68-8f785cf895df)
 
-![4dc2e7b03ab5a4a019c807697703539](https://github.com/blueveryday/GaoKao_University_inquiry/assets/29169337/ef4bb7af-2f04-4a99-bb27-c6c9ed4a5f7c)
+![1](https://github.com/blueveryday/GaoKao_University_inquiry/assets/29169337/9309caf8-accd-4035-b506-f2905eaeb2c9)
+![2](https://github.com/blueveryday/GaoKao_University_inquiry/assets/29169337/98bde438-2640-44f1-8899-4281abfac31d)
+![3](https://github.com/blueveryday/GaoKao_University_inquiry/assets/29169337/fcfcaa20-6fbe-46a2-b62f-566e5a48fab5)
 
-![bd2e27c8b04e6b3dc385212c017b9d7](https://github.com/blueveryday/GaoKao_University_inquiry/assets/29169337/bee35b79-8880-4b8e-9dab-8c6104dbbd4e)
+

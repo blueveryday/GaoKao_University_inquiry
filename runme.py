@@ -1,3 +1,5 @@
+# 编辑于2024-07-03 12:27
+
 import json
 import requests
 import csv
@@ -29,6 +31,7 @@ def search_school_id(csv_file, keyword):
         result = df[df['学校名称'].str.contains(keyword, case=False)]
         
         # 重置索引并删除原索引列
+
         result = result.reset_index(drop=True)
 
         # 打印查询结果
@@ -41,15 +44,18 @@ def search_school_id(csv_file, keyword):
             if not result.empty:
                 for idx, row in result.iterrows():
                     print(f"{idx:<5}", end="")  # 打印重置后的索引号
+
                     print(Fore.GREEN + f"{row['学校名称']:<30}" + Fore.RESET + f"{row['学校ID号']:<10}\n")  # 将学校名称左对齐，学校ID号左对齐，并将学校名称和学校ID号颜色设置为绿色
         else:
             input(Fore.RED + "未找到包含关键字的学校名称，按  Enter 键返回...\n" + Style.RESET_ALL)
             search_menu()  # 返回子菜单
+
     except Exception as e:
         print("程序出现异常：", e)
 
 def search_province_code(csv_file, keyword):
     # 通过省市区关键字查询省市区数字代码
+
     try:
         # 读取CSV文件
         df = pd.read_csv(csv_file, encoding='utf-8')
@@ -58,6 +64,7 @@ def search_province_code(csv_file, keyword):
         result = df[df.iloc[:, 0].str.contains(keyword, case=False)]
         
         # 重置索引并删除原索引列
+
         result = result.reset_index(drop=True)
         
         # 打印查询结果
@@ -65,22 +72,27 @@ def search_province_code(csv_file, keyword):
             print(Fore.RED + "\n查询结果：" + Style.RESET_ALL)  # 将查询结果文字颜色设置为红色
             for idx, row in result.iterrows():
                 print(f"{idx:<5}", end="")  # 打印重置后的索引号
+
                 print(Fore.GREEN + f"{row.iloc[0]:<30}" + Fore.RESET + f"{row.iloc[1]:<10}\n" + Style.RESET_ALL)  # 将省市区名称左对齐，省市区代码左对齐，并将省市区名称和省市区代码颜色设置为绿色
+
         else:
             input(Fore.RED + "未找到包含关键字的省市区名称，按  Enter 键返回...\n" + Style.RESET_ALL)
             search_menu()  # 返回子菜单
+
     except Exception as e:
         print("程序出现异常：", e)
 
 def search_json_data(filepath, score):
     while True:
         # 读取JSON文件并搜索数据
+
         with open(filepath, 'r', encoding='utf-8') as f:
             data = json.load(f)
             # 检查输入的高考分数是否在JSON数据的search字段中作为键存在
             if score in data["data"]["search"]:
                 search_results = [data["data"]["search"][score]]
                 break  # 如果找到结果，则退出循环
+
             else:
                 print(Fore.RED + "你输入的高考分数有误，请重新输入。" + Style.RESET_ALL)
                 score = input(Fore.GREEN + " ※ 请重新输入查询的高考分数：" + Style.RESET_ALL)
@@ -98,12 +110,52 @@ def generate_score_ranking_table(filepath, local_type_id, province_name, local_p
         appositive_fractions = [item['appositive_fraction'] for item in data["data"]["list"]]  # 获取历史同位次考生得分数据
         rank_ranges = [item['rank_range'] for item in data["data"]["list"]]  # 获取排名区间数据
 
-    # 创建工作簿并添加一分一段表工作表
+    # 创建工作簿
+
     wb = Workbook()
+
+    # 添加趋势图工作表并设置内容
+
     ws1 = wb.active
-    ws1.title = "一分一段表"
+    ws1.title = "趋势图"
+    trend_data = [
+        ["年份", "分数", "名次MAX", "名次MIN", "中位段", "位次段"],
+        ['=LEFT(一分一段表!J1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 9, FALSE)', '=--LEFT(TRIM(CLEAN(F2)), FIND("-", TRIM(CLEAN(F2))) - 1)', '=--RIGHT(TRIM(CLEAN(F2)), LEN(TRIM(CLEAN(F2))) - FIND("-", TRIM(CLEAN(F2))))', '=INT((C2+D2)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 10, FALSE))'],
+        ['=LEFT(一分一段表!H1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 7, FALSE)', '=--LEFT(TRIM(CLEAN(F3)), FIND("-", TRIM(CLEAN(F3))) - 1)', '=--RIGHT(TRIM(CLEAN(F3)), LEN(TRIM(CLEAN(F3))) - FIND("-", TRIM(CLEAN(F3))))', '=INT((C3+D3)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 8, FALSE))'],
+        ['=LEFT(一分一段表!F1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 5, FALSE)', '=--LEFT(TRIM(CLEAN(F4)), FIND("-", TRIM(CLEAN(F4))) - 1)', '=--RIGHT(TRIM(CLEAN(F4)), LEN(TRIM(CLEAN(F4))) - FIND("-", TRIM(CLEAN(F4))))', '=INT((C4+D4)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 6, FALSE))'],
+        ['=一分一段表!A1', '=--630', '=--LEFT(TRIM(CLEAN(F5)), FIND("-", TRIM(CLEAN(F5))) - 1)', '=--RIGHT(TRIM(CLEAN(F5)), LEN(TRIM(CLEAN(F5))) - FIND("-", TRIM(CLEAN(F5))))', '=INT((C5+D5)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 3, FALSE))']
+    ]
+    for row in trend_data:
+        ws1.append(row)
+    
+    # 设置趋势图工作表内容居中显示
+    for row in ws1.iter_rows(min_row=1, max_row=ws1.max_row, min_col=1, max_col=ws1.max_column):
+        for cell in row:
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+
+    # 添加数据筛选工作表并设置内容
+
+    ws2 = wb.create_sheet(title="数据筛选")
+    filter_data = [
+        ["年份", "分数", "名次MAX", "名次MIN", "中位段", "位次段"],
+        ['=LEFT(一分一段表!J1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 9, FALSE)', '=--LEFT(TRIM(CLEAN(F2)), FIND("-", TRIM(CLEAN(F2))) - 1)', '=--RIGHT(TRIM(CLEAN(F2)), LEN(TRIM(CLEAN(F2))) - FIND("-", TRIM(CLEAN(F2))))', '=INT((C2+D2)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 10, FALSE))'],
+        ['=LEFT(一分一段表!H1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 7, FALSE)', '=--LEFT(TRIM(CLEAN(F3)), FIND("-", TRIM(CLEAN(F3))) - 1)', '=--RIGHT(TRIM(CLEAN(F3)), LEN(TRIM(CLEAN(F3))) - FIND("-", TRIM(CLEAN(F3))))', '=INT((C3+D3)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 8, FALSE))'],
+        ['=LEFT(一分一段表!F1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 5, FALSE)', '=--LEFT(TRIM(CLEAN(F4)), FIND("-", TRIM(CLEAN(F4))) - 1)', '=--RIGHT(TRIM(CLEAN(F4)), LEN(TRIM(CLEAN(F4))) - FIND("-", TRIM(CLEAN(F4))))', '=INT((C4+D4)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 6, FALSE))'],
+        ['=一分一段表!A1', '=趋势图!B5', '=--LEFT(TRIM(CLEAN(F5)), FIND("-", TRIM(CLEAN(F5))) - 1)', '=--RIGHT(TRIM(CLEAN(F5)), LEN(TRIM(CLEAN(F5))) - FIND("-", TRIM(CLEAN(F5))))', '=INT((C5+D5)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 3, FALSE))']
+    ]
+    for row in filter_data:
+        ws2.append(row)
+    
+    # 设置数据筛选工作表内容居中显示
+    for row in ws2.iter_rows(min_row=1, max_row=ws2.max_row, min_col=1, max_col=ws2.max_column):
+        for cell in row:
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+
+    # 添加一分一段表工作表并设置内容
+    ws3 = wb.create_sheet(title="一分一段表")
 
     # 构建标题行
+
     title_row = ['分数', '同分人数', '排名区间', '累计人数']
     ls_years = set()
     for item in data["data"]["search"].values():
@@ -114,12 +166,14 @@ def generate_score_ranking_table(filepath, local_type_id, province_name, local_p
         title_row.extend([f'{ls_year}年同位次分数', f'{ls_year}年排名区间'])
 
     # 添加标题行到工作表
-    ws1.append(title_row)
+
+    ws3.append([''] + title_row)
 
     # 将数据写入一分一段表工作表
+
     for score, num, total, app_fraction, rank_range in zip(scores, nums, totals, appositive_fractions, rank_ranges):
-    #for i, (score, num, total, app_fraction, rank_range) in enumerate(zip(scores, nums, totals, appositive_fractions, rank_ranges)):
         row_data = [score, num, rank_range, total]  # 排名区间值直接插入到列表中
+
         for ls_year in sorted(ls_years, reverse=True):  # 历史同位次考生得分数据，按年份从大到小排序
             for fraction in app_fraction:
                 if fraction["year"] == ls_year:
@@ -127,22 +181,32 @@ def generate_score_ranking_table(filepath, local_type_id, province_name, local_p
                     break
 
         # 将数据写入工作表，并将其转换为数字类型
-        row_data = [value if isinstance(value, (int, float)) else float(value) if value.replace('.', '', 1).isdigit() else value for value in row_data]
-        ws1.append(row_data)
 
+        row_data = [value if isinstance(value, (int, float)) else float(value) if value.replace('.', '', 1).isdigit() else value for value in row_data]
+        ws3.append([''] + row_data)
+
+    # 设置A1单元格为年份值
+
+    ws3['A1'] = f"{year}年"
+    
     # 设置单元格内容居中显示
-    for row in ws1.iter_rows(min_row=1, max_row=ws1.max_row, min_col=1, max_col=ws1.max_column):
+
+    for row in ws3.iter_rows(min_row=1, max_row=ws3.max_row, min_col=1, max_col=ws3.max_column):
         for cell in row:
             cell.alignment = Alignment(horizontal='center', vertical='center')
 
     # 保存工作簿
+
     csv_folder = os.path.join("csv", str(province_name))
     os.makedirs(csv_folder, exist_ok=True)
-    excel_filepath = os.path.join(csv_folder, f"一分一段表_{local_type_id}_{province_name}{local_province_id}_{year}.xlsx")
-    wb.save(excel_filepath)
+    filename = f"一分一段表_{local_type_id}_{province_name}{local_province_id}_{year}.xlsx"
+    filepath = os.path.join(csv_folder, filename)
+    wb.save(filepath)
+    print(f"一分一段表Excel文件保存成功：{filepath}")
 
 def get_province_name(local_province_id):
     # 通过省市区代码查询对应的省市区名称
+
     src_province_file_path = "src/province_id.csv"
     if os.path.exists(src_province_file_path):
         with open(src_province_file_path, 'r', encoding='utf-8-sig') as src_province_file:
@@ -197,9 +261,10 @@ def score_ranking_menu():
         while True:
             print("==============================================")
             print("一分一段查询（同分人数、排名区间等）：\n")
-            print(Fore.GREEN + " [1] 通过高考分数查询（一分一段的同分人数、排名区间、累计人数、历史同位次考生得分）\n" + Style.RESET_ALL)
-            print(Fore.GREEN + " [2] 下载2016 - 2024年度的物理类（理科）、历史类（文科）一分一段JSON数据文件\n" + Style.RESET_ALL)
-            print(Fore.GREEN + " [3] 生成一分一段EXCEL文件\n" + Style.RESET_ALL)
+            print(Fore.GREEN + " [1] 通过高考分数查询（一分一段的同分人数、排名区间、累计人数、历史同位次考生得分）\n")
+            print(Fore.GREEN + " [2] 下载2016 - 2024年度的物理类（理科）、历史类（文科）一分一段JSON数据文件\n")
+            print(Fore.GREEN + " [3] 生成一分一段EXCEL文件\n")
+            print(Fore.GREEN + " [4] 打开：一分一段EXCEL文件\n" + Style.RESET_ALL)
             print(Fore.RED + " [0] 返回上级菜单" + Style.RESET_ALL)
 
             choice = input("\n请输入选项：")
@@ -209,6 +274,7 @@ def score_ranking_menu():
                 os.makedirs(folder_path, exist_ok=True)
                 filepath = os.path.join(folder_path, f"lists_{local_province_id}_{year}_{local_type_id}.json")  # 设置文件路径
                 province_name_results = get_province_name(local_province_id)  # 查询省市区名称
+
                 if not os.path.exists(filepath):
                     os.system("cls" if os.name == "nt" else "clear")
                     print(Fore.RED + f"\n你查询的{year}年一分一段JSON文件不存在，请先自定义下载文件后再查询！\n" + Style.RESET_ALL)
@@ -216,12 +282,14 @@ def score_ranking_menu():
 
                 while True:
                     # 提示输入查询高考分数
+
                     while True:
                         score_or_rank_input = input(Fore.GREEN + "\n ※ 请输入查询的高考分数：" + Style.RESET_ALL)
                         if not score_or_rank_input.isdigit() or int(score_or_rank_input) < 0 or int(score_or_rank_input) > 750:
                             print(Fore.RED + "错误：请输入0 - 750 之间的整数。" + Style.RESET_ALL)
                         else:
                             break  # 如果输入合法，则退出循环
+
 
                     search_results = search_json_data(filepath, score_or_rank_input)
                     if search_results:
@@ -239,19 +307,22 @@ def score_ranking_menu():
                                 ls_rank_range1 = app_fraction["rank_range"]
                                 print(f"{ls_year1}年同位次考生得分:{ls_score1}, 排名区间：{ls_rank_range1}")
                         print()  # 每个结果之间用空行分隔
+
                     else:
                         print(Fore.RED + "未找到与输入内容匹配的数据。" + Style.RESET_ALL)
 
                     # 提示询问用户是否继续查询
                     while True:
-                        continue_search = input(Fore.GREEN + "是否需要继续查询？（按 Y 继续，按 N 返回上级菜单，默认：y，按 Enter 键继续查询）：" + Style.RESET_ALL) or 'y'
+                        continue_search = input(Fore.GREEN + "是否继续查询？（Y/n，默认按 Enter 键继续）：" + Style.RESET_ALL) or 'y'
                         print()
                         if continue_search.lower() == 'y':
                             break  # 跳出内层循环，继续查询
+
                         elif continue_search.lower() == 'n':
                             break  # 跳出内层循环，返回上级菜单
+
                         else:
-                            print(Fore.RED + "错误：请输入 Y 或 N 。" + Style.RESET_ALL)
+                            print(Fore.RED + "错误：请输入 Y 或 n 。" + Style.RESET_ALL)
 
                     if continue_search.lower() == 'n':
                         os.system('cls' if os.name == 'nt' else 'clear')
@@ -297,7 +368,6 @@ def score_ranking_menu():
                 download_json(gk_year, local_province_id, local_type_id)
                 input("按 Enter 键返回。")
                 os.system('cls' if os.name == 'nt' else 'clear')
-
             elif choice == '3':
                 while True:
                     year = input(Fore.GREEN + " ※ 请输入年份" + Fore.RED + "（例如 2016 - 2028之间的年份，默认值为2024）: " + Style.RESET_ALL) or "2024"
@@ -306,6 +376,7 @@ def score_ranking_menu():
                         continue
                     else:
                         break  # 如果输入的年份有效，则退出循环
+
 
                 while True:
                     local_province_id = input(Fore.GREEN + " ※ 请输入省市区代码" + Fore.RED + "（例如 50，默认值为50）: " + Style.RESET_ALL) or "50"
@@ -321,8 +392,10 @@ def score_ranking_menu():
                         # 提示用户输入并获取 local_type_id
                         local_type_id = input(Fore.GREEN + " ※ 请输入物理、历史类代码" + Fore.RED + "（2021年及之后，2073 代表物理类，2074 代表历史类，默认值为2073）: " + Style.RESET_ALL) or "2073"
                         # 检查 local_type_id 是否在指定的范围内
+
                         if local_type_id in ["2073", "2074"]:
                             break  # 如果输入正确，跳出循环
+
                         else:
                             print(Fore.RED + "你输入的数字错误，请按照提示重新输入文理科代码！" + Style.RESET_ALL)
                             print("2021年之后的文理科代码是：" + Fore.RED + "2073 代表物理类，2074 代表历史类。" + Style.RESET_ALL)
@@ -331,8 +404,10 @@ def score_ranking_menu():
                         # 提示用户输入并获取 local_type_id
                         local_type_id = input(Fore.GREEN + " ※ 请输入文、理科代码" + Fore.RED + "（2021年之前（不含），1 代表理科，2 代表文科，默认值为1）: " + Style.RESET_ALL) or "1"
                         # 检查 local_type_id 是否在指定的范围内
+
                         if local_type_id in ["1", "2"]:
                             break  # 如果输入正确，跳出循环
+
                         else:
                             print(Fore.RED + "你输入的数字错误，请按照提示重新输入文理科代码！" + Style.RESET_ALL)
                             print("2021年之前的文理科代码是：" + Fore.RED + "1 代表理科，2 代表文科；" + Style.RESET_ALL)
@@ -348,6 +423,7 @@ def score_ranking_menu():
                 filepath = os.path.join(folder_path, f"lists_{local_province_id}_{year}_{local_type_id}.json")  # 设置文件路径
 
                 # 检查文件是否存在
+
                 if not os.path.exists(filepath):
                     os.system("cls" if os.name == "nt" else "clear")
                     print(Fore.RED + f"\nsrc路径下不存在 {os.path.basename(filepath)} 文件，请重新从选项[2]中下载正确的JSON文件。\n" + Style.RESET_ALL)
@@ -355,15 +431,38 @@ def score_ranking_menu():
 
                 # 生成一分一段表并保存为Excel
                 generate_score_ranking_table(filepath, local_type_id, province_name, local_province_id, year)
-                print(f"一分一段表已生成并保存至csv/{province_name}/文件夹中。\n")
                 
                 input(Fore.GREEN + "请按 Enter 键返回上级菜单。" + Style.RESET_ALL)
                 os.system("cls" if os.name == "nt" else "clear")  # 清空屏幕命令
-
+            elif choice == '4':
+                # 获取省份名称
+                province_name = get_province_name(local_province_id)
+                if not province_name:
+                    print(Fore.RED + "错误：未找到对应的省份名称。" + Style.RESET_ALL)
+                    continue
+                print("正在打开:一分一段表.xlsx文件\n")
+                file_path = os.path.join('csv', str(province_name), f"一分一段表_{local_type_id}_{province_name}{local_province_id}_{year}.xlsx")
+                print(f"文件路径: {file_path}\n") 
+                if os.path.exists(file_path):
+                    try:
+                        if os.name == 'nt':  # 如果是Windows系统
+                            os.startfile(file_path)
+                        elif sys.platform == 'darwin':  # 如果是macOS
+                            subprocess.call(['open', file_path])
+                        else:  # 如果是Linux系统
+                            subprocess.call(['xdg-open', file_path])
+                    except Exception as e:
+                        print(Fore.RED + f"打开文件时出错: {e}" + Style.RESET_ALL)
+                else:
+                    print(Fore.RED + "文件不存在！" + Style.RESET_ALL)
+                    break
+                os.system('cls' if os.name == 'nt' else 'clear')
+                break
             elif choice == '0':
                 os.system('cls' if os.name == 'nt' else 'clear')
                 return
                 break  # 返回上一级菜单
+
             else:
                 os.system('cls' if os.name == 'nt' else 'clear')
                 print(Fore.RED + "请选择正确的选项。\n" + Style.RESET_ALL)
@@ -371,12 +470,14 @@ def score_ranking_menu():
 
 def run_code(choice):  
     global local_province_id, local_type_id, school_id, total_pages, year
-    
+
     while True:
         if choice == 1:
             os.system('cls' if os.name == 'nt' else 'clear')
             # 院校分数线
+
             # 定义要下载的文件URL和本地保存路径
+
             # 地址实例:https://api.zjzw.cn/web/api/?e_sort=zslx_rank,mine_sorttype=desc,desc&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&uri=apidata/api/gk/score/province&year=2023
             base_url = 'https://api.zjzw.cn/web/api/?'
             parameters = {
@@ -402,11 +503,12 @@ def run_code(choice):
             download_file(url, local_filename)
         
             # 文件下载完成后，检查文件内容是否包含指定的值
+
             with open(local_filename, 'r', encoding='utf-8') as f:
                 content = json.load(f)
                 if content.get("numFound") == 0 or content.get("code") == "0003":
                     print("年份错误，非开启年。请重新输入年份！\n")
-                    input("按 Enter 键返回")
+                    input("按 Enter 键继续")
                     break
 
             # 读取 JSON 文件
@@ -438,17 +540,26 @@ def run_code(choice):
                     name = item['name']  # 学校名称
                     year = item['year']  # 招生年份
                     local_province_name = item['local_province_name']  # 省市区
+
                     local_type_name = item['local_type_name']  # 文理科
+
                     local_batch_name = item['local_batch_name']  # 录取批次
                     zslx_name = item['zslx_name']  # 招生类型
                     min_score = item['min']  # 最低分
                     min_section = item['min_section']  # 最低位次
+
                     proscore = item['proscore']  # 省控线
+
                     province_name = item['province_name']  # 学校所在省份
+
                     city_name = item['city_name']  # 学校所在城市
+
                     county_name = item['county_name']  # 学校所在区县
+
                     nature_name = item['nature_name']  # 办学属性
+
                     dual_class_name = item['dual_class_name']  # 是否双一流
+
                     # 写入CSV文件
                     writer.writerow([name, year, local_province_name, local_type_name, local_batch_name, zslx_name, min_score, min_section, proscore, province_name, city_name, county_name, nature_name, dual_class_name])
 
@@ -458,13 +569,16 @@ def run_code(choice):
         elif choice == 2:
                 os.system('cls' if os.name == 'nt' else 'clear')
                 # 专业分数线
+
                 # 人机交互式输入数据
+
                 # 查询省市区代码对应的省份名称
                 src_folder = "src"
                 src_province_file_name = "province_id.csv"
                 src_province_file_path = os.path.join(os.getcwd(), src_folder, src_province_file_name)
 
                 province_name = "未知省份"  # 默认值，如果找不到对应的省市区代码，则使用默认值
+
 
                 if os.path.exists(src_province_file_path):
                     with open(src_province_file_path, 'r', encoding='utf-8-sig') as src_province_file:
@@ -493,17 +607,22 @@ def run_code(choice):
                 all_filenames = []
 
                 # 循环处理每一页
+
                 for page_id in range(1, total_pages + 1):
                     # 定义要下载的文件URL和本地保存路径
+
                     # 地址实例:https://api.zjzw.cn/web/api/?local_batch_id=14&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&special_group=&uri=apidata/api/gk/score/special&year=2023
                     base_url = 'https://api.zjzw.cn/web/api/?'
                     parameters = {
                         'local_batch_id': local_batch_id,            # 录取批次
                         'local_province_id': local_province_id,      # 省市区代码
+
                         'local_type_id': local_type_id,              # 文理科
+
                         'page': str(page_id),                        # 网页页码总数
                         'school_id': school_id,                      # 学校id
                         'size': '10',                                # 每页显示条目数
+
                         'special_group': '',                         #
                         'uri': 'apidata/api/gk/score/special',       # 路径
                         'year': year                                 # 录取年份
@@ -521,12 +640,13 @@ def run_code(choice):
                     download_file(url, local_filename)
                 
                 # 文件下载完成后，检查文件内容是否包含指定的值
+
                 for local_filename in all_filenames:
                     with open(local_filename, 'r', encoding='utf-8') as f:
                         content = json.load(f)
                         if content.get("numFound") == 0 or content.get("code") == "0003":
                             print("年份错误，非开启年。请重新输入年份！\n")
-                            input("按 Enter 键返回")
+                            input("按 Enter 键继续")
                             return
                         else:
                             break
@@ -540,6 +660,7 @@ def run_code(choice):
                         all_items.extend(items)
 
                 # 获取项目的名称
+
                 if all_items:
                     first_item = all_items[0]
                     first_item_name = first_item['name']
@@ -556,6 +677,7 @@ def run_code(choice):
                     csv_file_path = os.path.join(school_folder_path, f"{first_item_name}_学校代码{school_id}_{local_type_name}_{two_item_name}{local_province_id}_{year}_专业分数线.csv")
 
                     # 打开 CSV 文件并写入数据
+
                     with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file:
                         writer = csv.writer(csv_file)
 
@@ -567,10 +689,14 @@ def run_code(choice):
                             name = item['name']  # 学校名称
                             local_batch_name = item['local_batch_name']  # 录取批次
                             local_province_name = item['local_province_name']  # 省市区
+
                             local_type_name = item['local_type_name']  # 文理科
+
                             min_score = item['min']  # 最低分
                             min_section = item['min_section']  # 最低位次
+
                             average = item['average']  # 平均分
+
                             sp_info = item['sp_info']  # 选科要求
                             spname = item['spname']  # 专业名称
 
@@ -586,12 +712,14 @@ def run_code(choice):
                 os.system('cls' if os.name == 'nt' else 'clear')
                 # 查询招生计划
                 # 人机交互式输入数据
+
                 # 查询省市区代码对应的省份名称
                 src_folder = "src"
                 src_province_file_name = "province_id.csv"
                 src_province_file_path = os.path.join(os.getcwd(), src_folder, src_province_file_name)
 
                 province_name = "未知省份"  # 默认值，如果找不到对应的省市区代码，则使用默认值
+
 
                 if os.path.exists(src_province_file_path):
                     with open(src_province_file_path, 'r', encoding='utf-8-sig') as src_province_file:
@@ -613,6 +741,7 @@ def run_code(choice):
                     os.makedirs(download_folder)
                     
                 # 将 year 转换为整数
+
                 year = int(year)
 
                 # 根据 year 值设置 local_batch_id
@@ -622,17 +751,22 @@ def run_code(choice):
                     local_batch_id = '14'
                         
                 # 循环处理每一页
+
                 for page_id in range(1, total_pages + 1):
                     # 定义要下载的文件URL和本地保存路径
+
                     # 地址实例:https://api.zjzw.cn/web/api/?local_batch_id=14&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&special_group=&uri=apidata/api/gkv3/plan/school&year=2023
                     base_url = 'https://api.zjzw.cn/web/api/?'
                     parameters = {
                         'local_batch_id': local_batch_id,          # 录取批次
                         'local_province_id': local_province_id,      # 省市区代码
+
                         'local_type_id': local_type_id,              # 文理科
+
                         'page': str(page_id),                        # 网页页码总数
                         'school_id': school_id,                      # 学校id
                         'size': '10',                                # 每页显示条目数
+
                         'special_group': '',                         #
                         'uri': 'apidata/api/gkv3/plan/school',       #路径
                         'year': year                                 #录取年份
@@ -649,6 +783,7 @@ def run_code(choice):
                     download_file(url, local_filename)
                 
                     # 文件下载完成后，检查文件内容是否包含指定的值
+
                     with open(local_filename, 'r', encoding='utf-8') as f:
                         try:
                             content = json.load(f)
@@ -658,8 +793,8 @@ def run_code(choice):
                         
                         if isinstance(content, dict) and content.get("numFound") == 0 or content.get("code") == "0003":
                             print("年份错误，非开启年。请重新输入年份！\n")
-                            input("按 Enter 键返回")
-                            return
+                            input("按 Enter 键继续")
+                            break
                         
                         # 读取 JSON 文件
                         if isinstance(content, dict) and 'data' in content and 'item' in content['data']:
@@ -692,6 +827,7 @@ def run_code(choice):
                 csv_file_path = os.path.join(type_folder_path, f"{first_item_name}_学校代码{school_id}_{local_type_name}_{province_name}{local_province_id}_{year}_招生计划.csv")
 
                 # 打开 CSV 文件并写入数据
+
                 with open(csv_file_path, mode='w', newline='', encoding='utf-8-sig') as csv_file:
                     writer = csv.writer(csv_file)
 
@@ -702,8 +838,10 @@ def run_code(choice):
                     for item in all_items:
                         name = item['name']  # 学校名称
                         province_name = item['province_name']  # 学校所在省份
+
                         year = item['year']  # 招生年份
                         local_type_name = item['local_type_name']  # 文理科
+
                         local_batch_name = item['local_batch_name']  # 录取批次
                         spname = item['spname']  # 专业名称
                         num = item['num']  # 计划招生
@@ -719,6 +857,7 @@ def run_code(choice):
         elif choice == 4:
             os.system('cls' if os.name == 'nt' else 'clear')
             # 查询开设专业
+
             # 设置请求头中的User-Agent
             headers = {
                 "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
@@ -734,7 +873,9 @@ def run_code(choice):
                 os.getcwd(), src_folder, src_province_file_name)
 
             school_name = "未知学校"  # 默认值，如果找不到对应的学校ID，则使用默认值
+
             province_name = "未知省份"  # 默认值，如果找不到对应的省市区代码，则使用默认值
+
 
             # 查询学校名称
             if os.path.exists(src_school_file_path):
@@ -755,6 +896,7 @@ def run_code(choice):
                             break
 
             # 定义文件夹路径和文件名
+
             folder_name = "csv"
             download_folder = "download"
             download_folder_path = os.path.join(os.getcwd(), download_folder)
@@ -762,6 +904,7 @@ def run_code(choice):
             school_subfolder = os.path.join(province_folder, school_name)
 
             # 创建文件夹
+
             os.makedirs(province_folder, exist_ok=True)
             os.makedirs(school_subfolder, exist_ok=True)
             os.makedirs(download_folder_path, exist_ok=True)
@@ -779,6 +922,7 @@ def run_code(choice):
                 print("JSON 文件下载失败。")
 
             # 检查请求是否成功
+
             if response.status_code == 200:
                 # 读取 JSON 文件
                 data = json.loads(response.text)
@@ -838,12 +982,15 @@ def run_code(choice):
                     ))
             
                 # 在 choice == 4 分支中，使用临时变量存储 year 的值
+
                 temp_year = year
             
                 # 获取招生年份列表中的第一个年份值
+
                 first_year = list(extracted_data)[0][-1]
 
                 # 定义文件名
+
                 file_name = f"{school_name}_学校代码{school_id}_{province_name}{local_province_id}_{first_year}_开设专业.csv"
                 file_path = os.path.join(school_subfolder, file_name)
 
@@ -853,7 +1000,9 @@ def run_code(choice):
 
                 # print(f"数据已成功保存到 {file_path} 文件中。")
                 # #显示文件保存的绝对路径
+
                 print(f"数据已成功保存到 {os.path.relpath(file_path)} 文件中。")  # 显示文件保存的相对路径
+
             else:
                 print("请求失败。")
             
@@ -877,7 +1026,9 @@ def run_code(choice):
                 os.getcwd(), src_folder, src_province_file_name)
 
             school_name = "未知学校"  # 默认值，如果找不到对应的学校ID，则使用默认值
+
             province_name = "未知省份"  # 默认值，如果找不到对应的省市区代码，则使用默认值
+
 
             # 查询学校名称
             if os.path.exists(src_school_file_path):
@@ -898,6 +1049,7 @@ def run_code(choice):
                             break
 
             # 定义文件夹路径和文件名
+
             folder_name = "csv"
             download_folder = "download"
             download_folder_path = os.path.join(os.getcwd(), download_folder)
@@ -905,6 +1057,7 @@ def run_code(choice):
             school_subfolder = os.path.join(province_folder, school_name)
 
             # 创建文件夹
+
             os.makedirs(province_folder, exist_ok=True)
             os.makedirs(school_subfolder, exist_ok=True)
             os.makedirs(download_folder_path, exist_ok=True)
@@ -922,6 +1075,7 @@ def run_code(choice):
                 print("JSON 文件下载失败。")
 
             # 检查请求是否成功
+
             if response.status_code == 200:
                 # 读取 JSON 文件
                 local_folder = 'download'
@@ -939,6 +1093,7 @@ def run_code(choice):
                     extracted_data.append([xueke_name, xueke_rank_score])
 
                 # 定义文件名
+
                 file_name = f"{school_name}_学校代码{school_id}_{province_name}{local_province_id}_{year}_{'_'.join(round_info)}学科评估.csv"
                 file_path = os.path.join(school_subfolder, file_name)
 
@@ -950,57 +1105,286 @@ def run_code(choice):
 
                 # print(f"数据已成功保存到 {file_path} 文件中。")
                 # #显示文件保存的绝对路径
+
                 print(f"数据已成功保存到 {os.path.relpath(file_path)} 文件中。")  # 显示文件保存的相对路径
+
             else:
                 print("请求失败。")
             
             input("按 Enter 键继续...") 
             break
         elif choice == 6:
-            # 地址实例:https://api.zjzw.cn/web/api/?e_sort=zslx_rank,mine_sorttype=desc,desc&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&uri=apidata/api/gk/score/province&year=2023
-            base_url = 'https://api.zjzw.cn/web/api/?'
-            parameters = {
-                'e_sort': 'zslx_rank,mine_sorttype=desc,desc',
-                'local_province_id': local_province_id,
-                'local_type_id': local_type_id,
-                'page': '1',
-                'school_id': school_id,
-                'size': '10',
-                'uri': 'apidata/api/gk/score/province',
-                'year': year
-            }
-            url = base_url + \
-                '&'.join([f"{key}={value}" for key, value in parameters.items()])
-            local_folder = 'download'
-            local_filename = os.path.join(local_folder, f"院校分数线_{school_id}_{local_type_id}.json")
+                while True:
+                        # 地址实例: https://api.zjzw.cn/web/api/?e_sort=zslx_rank,mine_sorttype=desc,desc&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&uri=apidata/api/gk/score/province&year=2023
+                        base_url = 'https://api.zjzw.cn/web/api/?'
+                        parameters = {
+                                'e_sort': 'zslx_rank,mine_sorttype=desc,desc',
+                                'local_province_id': local_province_id,
+                                'local_type_id': local_type_id,
+                                'page': '1',
+                                'school_id': school_id,
+                                'size': '10',
+                                'uri': 'apidata/api/gk/score/province',
+                                'year': year
+                        }
+                        url = base_url + '&'.join([f"{key}={value}" for key, value in parameters.items()])
+                        local_folder = 'download'
+                        local_filename = os.path.join(local_folder, f"院校分数线_{school_id}_{local_type_id}.json")
 
-            # 创建保存 JSON 文件的文件夹
-            if not os.path.exists(local_folder):
-                os.makedirs(local_folder)
+                        # 创建保存 JSON 文件的文件夹
+                        if not os.path.exists(local_folder):
+                                os.makedirs(local_folder)
 
-            # 下载文件
-            download_file(url, local_filename)
-        
-            # 文件下载完成后，检查文件内容是否包含指定的值
-            with open(local_filename, 'r', encoding='utf-8') as f:
-                content = json.load(f)
-                if content.get("numFound") == 0 or content.get("code") == "0003":
-                    print("年份错误，非开启年。请重新输入年份！\n")
-                    input("按 Enter 键返回")
-                    break
+                        # 下载文件
+                        download_file(url, local_filename)
 
-            os.system('cls' if os.name == 'nt' else 'clear')
-            # 一键获取学校全部信息
-            run_code(1)
-            run_code(2)
-            run_code(3)
-            run_code(4)
-            run_code(5)
-            input("\n全部查询已完成，按 Enter 返回主菜单")
-            break
+                        # 一键获取学校全部信息，按照指定顺序执行代码
+                        for code in [1, 2, 3, 4, 5]:
+                                try:
+                                        if code == 1:
+                                                # 处理 `院校分数线` 的文件下载和内容检查
+
+                                                # 执行指定代码
+                                                run_code(code)
+
+                                        elif code == 2:
+                                                # 专业分数线
+
+                                                # 人机交互式输入数据
+
+                                                # 查询省市区代码对应的省份名称
+                                                src_folder = "src"
+                                                src_province_file_name = "province_id.csv"
+                                                src_province_file_path = os.path.join(os.getcwd(), src_folder, src_province_file_name)
+
+                                                province_name = "未知省份"  # 默认值，如果找不到对应的省市区代码，则使用默认值
+
+
+                                                if os.path.exists(src_province_file_path):
+                                                        with open(src_province_file_path, 'r', encoding='utf-8-sig') as src_province_file:
+                                                                reader = csv.reader(src_province_file)
+                                                                for row in reader:
+                                                                        if row[1] == local_province_id:
+                                                                                province_name = row[0]
+                                                                                break
+
+                                                # 创建保存 CSV 文件的文件夹
+                                                csv_folder = 'csv'
+                                                download_folder = 'download'
+                                                for folder in [csv_folder, download_folder]:
+                                                        if not os.path.exists(folder):
+                                                                os.makedirs(folder)
+
+                                                year = int(year)
+
+                                                # 根据 year 值设置 local_batch_id
+                                                if year <= 2020:
+                                                        local_batch_id = '7'
+                                                else:
+                                                        local_batch_id = '14'
+
+                                                # 创建一个列表来存储所有页面的数据
+                                                all_filenames = []
+
+                                                # 循环处理每一页
+
+                                                for page_id in range(1, total_pages + 1):
+                                                        # 定义要下载的文件URL和本地保存路径
+
+                                                        # 地址实例: https://api.zjzw.cn/web/api/?local_batch_id=14&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&special_group=&uri=apidata/api/gk/score/special&year=2023
+                                                        base_url = 'https://api.zjzw.cn/web/api/?'
+                                                        parameters = {
+                                                                'local_batch_id': local_batch_id,            # 录取批次
+                                                                'local_province_id': local_province_id,      # 省市区代码
+
+                                                                'local_type_id': local_type_id,              # 文理科
+
+                                                                'page': str(page_id),                        # 网页页码总数
+                                                                'school_id': school_id,                      # 学校id
+                                                                'size': '10',                                # 每页显示条目数
+
+                                                                'special_group': '',                         #
+                                                                'uri': 'apidata/api/gk/score/special',       # 路径
+                                                                'year': year                                 # 录取年份
+                                                        }
+                                                        url = base_url + '&'.join([f"{key}={value}" for key, value in parameters.items()])
+                                                        local_filename = os.path.join(local_folder, f'专业分数线_{school_id}_{page_id}.json')
+                                                        all_filenames.append(local_filename)
+
+                                                        # 创建保存 JSON 文件的文件夹
+                                                        if not os.path.exists(local_folder):
+                                                                os.makedirs(local_folder)
+
+                                                        # 下载文件
+                                                        download_file(url, local_filename)
+
+                                                # 执行指定代码
+                                                run_code(code)
+
+                                        elif code == 3:
+                                                # 查询招生计划
+                                                # 人机交互式输入数据
+
+                                                # 查询省市区代码对应的省份名称
+                                                src_folder = "src"
+                                                src_province_file_name = "province_id.csv"
+                                                src_province_file_path = os.path.join(os.getcwd(), src_folder, src_province_file_name)
+
+                                                province_name = "未知省份"  # 默认值，如果找不到对应的省市区代码，则使用默认值
+
+
+                                                if os.path.exists(src_province_file_path):
+                                                        with open(src_province_file_path, 'r', encoding='utf-8-sig') as src_province_file:
+                                                                reader = csv.reader(src_province_file)
+                                                                for row in reader:
+                                                                        if row[1] == local_province_id:
+                                                                                province_name = row[0]
+                                                                                break
+
+                                                # 创建一个列表来存储所有页面的数据
+                                                all_items = []
+
+                                                # 创建保存 CSV 文件的文件夹
+                                                csv_folder = 'csv'
+                                                if not os.path.exists(csv_folder):
+                                                        os.makedirs(csv_folder)
+                                                download_folder = 'download'
+                                                if not os.path.exists(download_folder):
+                                                        os.makedirs(download_folder)
+
+                                                # 将 year 转换为整数
+
+                                                year = int(year)
+
+                                                # 根据 year 值设置 local_batch_id
+                                                if year <= 2020:
+                                                        local_batch_id = '7'
+                                                else:
+                                                        local_batch_id = '14'
+
+                                                # 循环处理每一页
+
+                                                for page_id in range(1, total_pages + 1):
+                                                        # 定义要下载的文件URL和本地保存路径
+
+                                                        # 地址实例: https://api.zjzw.cn/web/api/?local_batch_id=14&local_province_id=50&local_type_id=2073&page=1&school_id=109&size=10&special_group=&uri=apidata/api/gkv3/plan/school&year=2023
+                                                        base_url = 'https://api.zjzw.cn/web/api/?'
+                                                        parameters = {
+                                                                'local_batch_id': local_batch_id,          # 录取批次
+                                                                'local_province_id': local_province_id,      # 省市区代码
+
+                                                                'local_type_id': local_type_id,              # 文理科
+
+                                                                'page': str(page_id),                        # 网页页码总数
+                                                                'school_id': school_id,                      # 学校id
+                                                                'size': '10',                                # 每页显示条目数
+
+                                                                'special_group': '',                         #
+                                                                'uri': 'apidata/api/gkv3/plan/school',       #路径
+                                                                'year': year                                 #录取年份
+                                                        }
+                                                        url = base_url + '&'.join([f"{key}={value}" for key, value in parameters.items()])
+                                                        local_filename = os.path.join(download_folder, f'招生计划_{school_id}_{year}_{page_id}.json')
+
+                                                        # 创建保存 JSON 文件的文件夹
+                                                        if not os.path.exists(download_folder):
+                                                                os.makedirs(download_folder)
+
+                                                        # 下载文件
+                                                        download_file(url, local_filename)
+
+                                                # 文件下载完成后，检查文件内容是否符合要求
+
+                                                for filename in all_items:
+                                                        if os.path.exists(filename):
+                                                                with open(filename, 'r', encoding='utf-8') as f:
+                                                                        content = json.load(f)
+                                                                        if not content:
+                                                                                print(f"文件 {filename} 内容为空，请检查下载是否成功！\n")
+                                                                                input("按 Enter 键继续")
+                                                                                # 在这里继续循环，跳过当前 `run_code` 执行
+                                                                                continue
+                                                        else:
+                                                                print(f"文件 {filename} 不存在，请检查下载是否成功！")
+                                                                continue
+
+                                                # 执行指定代码
+                                                run_code(code)
+
+                                        elif code == 4:
+                                                # 下载 `开设专业` 文件
+                                                url = f"https://static-data.gaokao.cn/www/2.0/school/{school_id}/pc_special.json"
+                                                local_filename = os.path.join(download_folder, f"开设专业_{school_id}_pc_special.json")
+
+                                                # 创建保存 JSON 文件的文件夹
+                                                if not os.path.exists(download_folder):
+                                                        os.makedirs(download_folder)
+
+                                                # 下载文件
+                                                download_file(url, local_filename)
+
+                                                # 文件下载完成后，检查文件内容是否为空
+
+                                                if os.path.exists(local_filename):
+                                                        with open(local_filename, 'r', encoding='utf-8') as f:
+                                                                content = json.load(f)
+                                                                if not content:
+                                                                        print(f"文件 {local_filename} 内容为空，请检查下载是否成功！\n")
+                                                                # 继续执行下一个代码段
+                                                else:
+                                                        print(f"文件 {local_filename} 不存在，请检查下载是否成功！")
+
+                                                # 执行指定代码
+                                                run_code(code)
+
+                                        elif code == 5:
+                                                # 下载 `学科评估` 文件
+                                                url = f"https://static-data.gaokao.cn/www/2.0/school/{school_id}/xueke_rank.json"
+                                                local_filename = os.path.join(download_folder, f"学科评估_{school_id}_xueke_rank.json")
+
+                                                # 创建保存 JSON 文件的文件夹
+                                                if not os.path.exists(download_folder):
+                                                        os.makedirs(download_folder)
+
+                                                # 下载文件
+                                                download_file(url, local_filename)
+
+                                                # 文件下载完成后，检查文件内容是否为空
+
+                                                if os.path.exists(local_filename):
+                                                        with open(local_filename, 'r', encoding='utf-8') as f:
+                                                                content = json.load(f)
+                                                                if not content:
+                                                                        print(f"文件 {local_filename} 内容为空，请检查下载是否成功！\n")
+                                                                # 继续执行下一个代码段
+                                                else:
+                                                        print(f"文件 {local_filename} 不存在，请检查下载是否成功！")
+
+                                                # 执行指定代码
+                                                run_code(code)
+
+                                        else:
+                                                print("无效的 code，请检查并重试！")
+
+                                except Exception as e:
+                                        print(f"执行代码 {code} 时发生错误: {e}")
+
+                        # 提示用户是否重新输入学校ID，继续查询
+                        print("\n查询已完成!")
+                        while True:
+                            continue_search = input(Fore.GREEN + "是否继续一键查询学校全部信息？（Y/n，默认按 Enter 键继续）：" + Style.RESET_ALL) or 'y'
+                            if continue_search.lower() == 'y':
+                                school_id = input("请输入新的学校ID: ").strip()  # 提示用户输入新的学校ID，继续进行下一个学校的查询。
+                                break  # 跳出内层循环，继续查询
+                            elif continue_search.lower() == 'n':
+                                os.system('cls' if os.name == 'nt' else 'clear')  # 清屏
+                                return  # 返回主菜单
+                            else:
+                                print("无效的输入，请输入 'Y' 或 'n'")
         elif choice == 7:
             os.system('cls' if os.name == 'nt' else 'clear')
             # 查询省市区代码或学校ID号
+
             search_menu()
             break
         elif choice == 8:
@@ -1023,13 +1407,16 @@ def run_code(choice):
                 else:
                     break  # 如果输入的年份有效，则退出循环
 
+
             if int(year) >= 2021:
                 while True:
                     # 提示用户输入并获取 local_type_id
                     local_type_id = input(Fore.GREEN + " ※ 请输入物理、历史类代码" + Fore.RED + "（2021年及之后，2073 代表物理类，2074 代表历史类，默认值为2073）: " + Style.RESET_ALL) or "2073"
                     # 检查 local_type_id 是否在指定的范围内
+
                     if local_type_id in ["2073", "2074"]:
                         break  # 如果输入正确，跳出循环
+
                     else:
                         print(Fore.RED + "你输入的数字错误，请按照提示重新输入文理科代码！" + Style.RESET_ALL)
                         print("2021年之后的文理科代码是：" + Fore.RED + "2073 代表物理类，2074 代表历史类。" + Style.RESET_ALL)
@@ -1038,8 +1425,10 @@ def run_code(choice):
                     # 提示用户输入并获取 local_type_id
                     local_type_id = input(Fore.GREEN + " ※ 请输入文、理科代码" + Fore.RED + "（2021年之前（不含），1 代表理科，2 代表文科，默认值为1）: " + Style.RESET_ALL) or "1"
                     # 检查 local_type_id 是否在指定的范围内
+
                     if local_type_id in ["1", "2"]:
                         break  # 如果输入正确，跳出循环
+
                     else:
                         print(Fore.RED + "你输入的数字错误，请按照提示重新输入文理科代码！" + Style.RESET_ALL)
                         print("2021年之前的文理科代码是：" + Fore.RED + "1 代表理科，2 代表文科；" + Style.RESET_ALL)
@@ -1050,11 +1439,13 @@ def run_code(choice):
         elif choice == 9:
             os.system("cls" if os.name == "nt" else "clear")  # 清空屏幕命令
             # 查询一分一段
+
             score_ranking_menu() 
             break
         elif choice == 10:
             os.system('cls' if os.name == 'nt' else 'clear')
             # 清空下载文件夹中的全部文件
+
             download_folder = 'download'
             if os.path.exists(download_folder):
                 for filename in os.listdir(download_folder):
@@ -1106,6 +1497,7 @@ def run_code(choice):
                             df = pd.read_csv(file_name)
                 
                             # 构建新的文件夹路径
+
                             relative_path = os.path.relpath(dirpath, data_path)
                             new_dir = os.path.join(output_path, relative_path)
                 
@@ -1113,19 +1505,23 @@ def run_code(choice):
                             os.makedirs(new_dir, exist_ok=True)
                 
                             # 构建新文件路径
+
                             new_file_path = os.path.join(new_dir, f"{os.path.splitext(fname)[0]}.xlsx")
                             df.to_excel(new_file_path, index=False)
                             print(f'{file_name} 转换为 {new_file_path} 成功')
                             print('==============================================')
             # 获取当前脚本所在目录
+
             current_dir = os.path.dirname(os.path.abspath(__file__))
             # 将 data_path 设置为当前目录下的 csv 文件夹
+
             data_path = os.path.join(current_dir, "csv")
             # 将 output_path 设置为当前目录下的 xlsx 文件夹
+
             output_path = os.path.join(current_dir, "xlsx")
             csv_save_as_xlsx(data_path, output_path) 
             input("\n转换完成，按 Enter 键继续...")
-            break            
+            break
         elif choice == 0:
             return  # Exiting the function, which effectively returns to the main menu
         else:
@@ -1135,9 +1531,12 @@ def run_code(choice):
 def main():
     global local_province_id, local_type_id, school_id, total_pages, year
     colorama.init(autoreset=True)  # 初始化colorama库
+
     
     # 获取用户输入，如果为空则使用默认值
+
     # 输入有效省市区代码
+
     while True:
         local_province_id = input(Fore.GREEN + " ※ 请输入省市区代码" + Fore.RED + "（例如 50，默认值为50）: " + Style.RESET_ALL) or "50"
         if get_province_name(local_province_id) is None:
@@ -1155,13 +1554,16 @@ def main():
         else:
             break  # 如果输入的年份有效，则退出循环
 
+
     if int(year) >= 2021:
         while True:
             # 提示用户输入并获取 local_type_id
             local_type_id = input(Fore.GREEN + " ※ 请输入物理、历史类代码" + Fore.RED + "（2021年及之后，2073 代表物理类，2074 代表历史类，默认值为2073）: " + Style.RESET_ALL) or "2073"
             # 检查 local_type_id 是否在指定的范围内
+
             if local_type_id in ["2073", "2074"]:
                 break  # 如果输入正确，跳出循环
+
             else:
                 print(Fore.RED + "你输入的数字错误，请按照提示重新输入文理科代码！" + Style.RESET_ALL)
                 print("2021年之后的文理科代码是：" + Fore.RED + "2073 代表物理类，2074 代表历史类。" + Style.RESET_ALL)
@@ -1170,8 +1572,10 @@ def main():
             # 提示用户输入并获取 local_type_id
             local_type_id = input(Fore.GREEN + " ※ 请输入文、理科代码" + Fore.RED + "（2021年之前（不含），1 代表理科，2 代表文科，默认值为1）: " + Style.RESET_ALL) or "1"
             # 检查 local_type_id 是否在指定的范围内
+
             if local_type_id in ["1", "2"]:
                 break  # 如果输入正确，跳出循环
+
             else:
                 print(Fore.RED + "你输入的数字错误，请按照提示重新输入文理科代码！" + Style.RESET_ALL)
                 print("2021年之前的文理科代码是：" + Fore.RED + "1 代表理科，2 代表文科；" + Style.RESET_ALL)
@@ -1195,7 +1599,7 @@ def main():
         print(Fore.GREEN + " [9] 查询一分一段\n")
         print(Fore.CYAN + " [10] 清空download文件夹")
         print(Fore.CYAN + " [11] 更新学校id(默认不需要执行)\n"+ Style.RESET_ALL)
-        print(Fore.GREEN + " [12] 将CSV文件批量转换成XLSX文件\n" + Style.RESET_ALL)
+        print(Fore.GREEN + " [12] 将CSV文件批量转换成XLSX文件\n"+ Style.RESET_ALL)
         print(Fore.RED + " [0] 退出\n" + Style.RESET_ALL)
         print("==============================================\n")
         

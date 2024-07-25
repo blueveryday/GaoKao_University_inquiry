@@ -7,10 +7,13 @@ import os
 import platform
 import sys
 import pandas as pd
+import plotly.graph_objs as go
+import plotly.express as px
+import plotly.io as pio
 import colorama
 from colorama import Fore, Style, init
-from openpyxl import Workbook
-from openpyxl.styles import Alignment
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Alignment, PatternFill
 from openpyxl.utils import get_column_letter
 
 def download_file(url, local_filename):
@@ -84,32 +87,37 @@ def search_json_data(filepath, score):
     return search_results
 
 def generate_score_ranking_table(filepath, local_type_id, province_name, local_province_id, year):
-    # 读取JSON文件
+    # 读取 JSON 数据
     with open(filepath, 'r', encoding='utf-8') as f:
         data = json.load(f)
         scores = [item['score'] for item in data["data"]["list"]]
         nums = [item['num'] for item in data["data"]["list"]]
-        totals = [item['total'] for item in data["data"]["list"]] # 添加总数数据
+        totals = [item['total'] for item in data["data"]["list"]]  # 添加总数数据
         appositive_fractions = [item['appositive_fraction'] for item in data["data"]["list"]]  # 获取历史同位次考生得分数据
         rank_ranges = [item['rank_range'] for item in data["data"]["list"]]  # 获取排名区间数据
+
     # 创建工作簿
     wb = Workbook()
+    # 删除默认的空白工作表
+    default_sheet = wb.active
+    wb.remove(default_sheet)
+
     # 添加趋势图工作表并设置内容
-    ws1 = wb.active
-    ws1.title = "趋势图"
-    trend_data = [
-        ["年份", "分数", "名次MAX", "名次MIN", "中位段", "位次段"],
-        ['=LEFT(一分一段表!J1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 9, FALSE)', '=--LEFT(TRIM(CLEAN(F2)), FIND("-", TRIM(CLEAN(F2))) - 1)', '=--RIGHT(TRIM(CLEAN(F2)), LEN(TRIM(CLEAN(F2))) - FIND("-", TRIM(CLEAN(F2))))', '=INT((C2+D2)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 10, FALSE))'],
-        ['=LEFT(一分一段表!H1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 7, FALSE)', '=--LEFT(TRIM(CLEAN(F3)), FIND("-", TRIM(CLEAN(F3))) - 1)', '=--RIGHT(TRIM(CLEAN(F3)), LEN(TRIM(CLEAN(F3))) - FIND("-", TRIM(CLEAN(F3))))', '=INT((C3+D3)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 8, FALSE))'],
-        ['=LEFT(一分一段表!F1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 5, FALSE)', '=--LEFT(TRIM(CLEAN(F4)), FIND("-", TRIM(CLEAN(F4))) - 1)', '=--RIGHT(TRIM(CLEAN(F4)), LEN(TRIM(CLEAN(F4))) - FIND("-", TRIM(CLEAN(F4))))', '=INT((C4+D4)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 6, FALSE))'],
-        ['=一分一段表!A1', '=--630', '=--LEFT(TRIM(CLEAN(F5)), FIND("-", TRIM(CLEAN(F5))) - 1)', '=--RIGHT(TRIM(CLEAN(F5)), LEN(TRIM(CLEAN(F5))) - FIND("-", TRIM(CLEAN(F5))))', '=INT((C5+D5)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 3, FALSE))']
-    ]
-    for row in trend_data:
-        ws1.append(row)
-    # 设置趋势图工作表内容居中显示
-    for row in ws1.iter_rows(min_row=1, max_row=ws1.max_row, min_col=1, max_col=ws1.max_column):
-        for cell in row:
-            cell.alignment = Alignment(horizontal='center', vertical='center')
+    #ws1 = wb.active
+    #ws1.title = "趋势图"
+    #trend_data = [
+    #    ["年份", "分数", "名次MAX", "名次MIN", "中位段", "位次段"],
+    #    ['=LEFT(一分一段表!J1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 9, FALSE)', '=--LEFT(TRIM(CLEAN(F2)), FIND("-", TRIM(CLEAN(F2))) - 1)', '=--RIGHT(TRIM(CLEAN(F2)), LEN(TRIM(CLEAN(F2))) - FIND("-", TRIM(CLEAN(F2))))', '=INT((C2+D2)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 10, FALSE))'],
+    #    ['=LEFT(一分一段表!H1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 7, FALSE)', '=--LEFT(TRIM(CLEAN(F3)), FIND("-", TRIM(CLEAN(F3))) - 1)', '=--RIGHT(TRIM(CLEAN(F3)), LEN(TRIM(CLEAN(F3))) - FIND("-", TRIM(CLEAN(F3))))', '=INT((C3+D3)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 8, FALSE))'],
+    #    ['=LEFT(一分一段表!F1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 5, FALSE)', '=--LEFT(TRIM(CLEAN(F4)), FIND("-", TRIM(CLEAN(F4))) - 1)', '=--RIGHT(TRIM(CLEAN(F4)), LEN(TRIM(CLEAN(F4))) - FIND("-", TRIM(CLEAN(F4))))', '=INT((C4+D4)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 6, FALSE))'],
+    #    ['=一分一段表!A1', '=--630', '=--LEFT(TRIM(CLEAN(F5)), FIND("-", TRIM(CLEAN(F5))) - 1)', '=--RIGHT(TRIM(CLEAN(F5)), LEN(TRIM(CLEAN(F5))) - FIND("-", TRIM(CLEAN(F5))))', '=INT((C5+D5)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 3, FALSE))']
+    #]
+    #for row in trend_data:
+    #    ws1.append(row)
+    #for row in ws1.iter_rows(min_row=1, max_row=ws1.max_row, min_col=1, max_col=ws1.max_column):
+    #    for cell in row:
+    #        cell.alignment = Alignment(horizontal='center', vertical='center')
+
     # 添加数据筛选工作表并设置内容
     ws2 = wb.create_sheet(title="数据筛选")
     filter_data = [
@@ -117,17 +125,18 @@ def generate_score_ranking_table(filepath, local_type_id, province_name, local_p
         ['=LEFT(一分一段表!J1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 9, FALSE)', '=--LEFT(TRIM(CLEAN(F2)), FIND("-", TRIM(CLEAN(F2))) - 1)', '=--RIGHT(TRIM(CLEAN(F2)), LEN(TRIM(CLEAN(F2))) - FIND("-", TRIM(CLEAN(F2))))', '=INT((C2+D2)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 10, FALSE))'],
         ['=LEFT(一分一段表!H1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 7, FALSE)', '=--LEFT(TRIM(CLEAN(F3)), FIND("-", TRIM(CLEAN(F3))) - 1)', '=--RIGHT(TRIM(CLEAN(F3)), LEN(TRIM(CLEAN(F3))) - FIND("-", TRIM(CLEAN(F3))))', '=INT((C3+D3)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 8, FALSE))'],
         ['=LEFT(一分一段表!F1,5)', '=VLOOKUP(B5, 一分一段表!$B:$K, 5, FALSE)', '=--LEFT(TRIM(CLEAN(F4)), FIND("-", TRIM(CLEAN(F4))) - 1)', '=--RIGHT(TRIM(CLEAN(F4)), LEN(TRIM(CLEAN(F4))) - FIND("-", TRIM(CLEAN(F4))))', '=INT((C4+D4)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 6, FALSE))'],
-        ['=一分一段表!A1', '=趋势图!B5', '=--LEFT(TRIM(CLEAN(F5)), FIND("-", TRIM(CLEAN(F5))) - 1)', '=--RIGHT(TRIM(CLEAN(F5)), LEN(TRIM(CLEAN(F5))) - FIND("-", TRIM(CLEAN(F5))))', '=INT((C5+D5)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 3, FALSE))']
+        ['=一分一段表!A1', '=--630', '=--LEFT(TRIM(CLEAN(F5)), FIND("-", TRIM(CLEAN(F5))) - 1)', '=--RIGHT(TRIM(CLEAN(F5)), LEN(TRIM(CLEAN(F5))) - FIND("-", TRIM(CLEAN(F5))))', '=INT((C5+D5)/2)', '=TRIM(VLOOKUP(B5, 一分一段表!$B:$K, 3, FALSE))']
     ]
     for row in filter_data:
         ws2.append(row)
-    # 设置数据筛选工作表内容居中显示
     for row in ws2.iter_rows(min_row=1, max_row=ws2.max_row, min_col=1, max_col=ws2.max_column):
         for cell in row:
             cell.alignment = Alignment(horizontal='center', vertical='center')
+    # 将特定单元格设为红色
+    red_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
+    ws2['B5'].fill = red_fill
     # 添加一分一段表工作表并设置内容
     ws3 = wb.create_sheet(title="一分一段表")
-    # 构建标题行
     title_row = ['分数', '同分人数', '排名区间', '累计人数']
     ls_years = set()
     for item in data["data"]["search"].values():
@@ -135,32 +144,68 @@ def generate_score_ranking_table(filepath, local_type_id, province_name, local_p
             ls_years.add(fraction["year"])
     for ls_year in sorted(ls_years, reverse=True):
         title_row.extend([f'{ls_year}年同位次分数', f'{ls_year}年排名区间'])
-    # 添加标题行到工作表
     ws3.append([''] + title_row)
-    # 将数据写入一分一段表工作表
     for score, num, total, app_fraction, rank_range in zip(scores, nums, totals, appositive_fractions, rank_ranges):
-        row_data = [score, num, rank_range, total]  # 排名区间值直接插入到列表中
-        for ls_year in sorted(ls_years, reverse=True):  # 历史同位次考生得分数据，按年份从大到小排序
+        row_data = [score, num, rank_range, total]
+        for ls_year in sorted(ls_years, reverse=True):
             for fraction in app_fraction:
                 if fraction["year"] == ls_year:
                     row_data.extend([fraction["score"], fraction["rank_range"]])
                     break
-        # 将数据写入工作表，并将其转换为数字类型
         row_data = [value if isinstance(value, (int, float)) else float(value) if value.replace('.', '', 1).isdigit() else value for value in row_data]
         ws3.append([''] + row_data)
-    # 设置A1单元格为年份值
     ws3['A1'] = f"{year}年"
-    # 设置单元格内容居中显示
     for row in ws3.iter_rows(min_row=1, max_row=ws3.max_row, min_col=1, max_col=ws3.max_column):
         for cell in row:
             cell.alignment = Alignment(horizontal='center', vertical='center')
     # 保存工作簿
     csv_folder = os.path.join("csv", str(province_name))
     os.makedirs(csv_folder, exist_ok=True)
-    filename = f"一分一段表_{local_type_id}_{province_name}{local_province_id}_{year}.xlsx"
+    
+    # 映射 local_type_id 到 local_type_display_name 的字典
+    local_type_display_name_map = {
+        2073: '物理类',
+        2074: '历史类',
+        1: '理科',
+        2: '文科'
+    }
+    try:
+        local_type_id = int(local_type_id)
+    except ValueError:
+        print(f"Error: local_type_id 的值不正确: {local_type_id}")
+        local_type_id = None
+    # 获取 local_type_display_name
+    if local_type_id is not None:
+        local_type_display_name = local_type_display_name_map.get(local_type_id, '未知类型')
+    else:
+        local_type_display_name = '未知类型'
+
+    yfyd_name = f"{local_type_display_name}"
+    filename = f"一分一段表_{yfyd_name}_{province_name}_{year}.xlsx"
     filepath = os.path.join(csv_folder, filename)
     wb.save(filepath)
-    print(f"一分一段表Excel文件保存成功：{filepath}")
+    # 读取并处理已保存的工作簿
+    wb = load_workbook(filepath)
+    ws = wb["一分一段表"]
+    # 复制第二行的数据
+    second_row = [cell.value for cell in ws[2]]
+    ws.insert_rows(3)
+    for col_num, value in enumerate(second_row, start=1):
+        ws.cell(row=3, column=col_num, value=value)
+    # 修改 B3 单元格的内容
+    original_b3_value = ws["B3"].value
+    if original_b3_value and isinstance(original_b3_value, str):
+        extracted_value = original_b3_value[:3]
+        try:
+            integer_value = int(extracted_value)
+            ws["B3"] = integer_value
+        except ValueError:
+            print(f"无法将提取的字符串 '{extracted_value}' 转换为整数。")
+    for row in ws.iter_rows(min_row=1, max_row=ws.max_row, min_col=1, max_col=ws.max_column):
+        for cell in row:
+            cell.alignment = Alignment(horizontal='center', vertical='center')
+    wb.save(filepath)
+    print(f"文件已保存到: {filepath} ")
 
 def get_province_name(local_province_id):
     # 通过省市区代码查询对应的省市区名称
@@ -221,7 +266,8 @@ def score_ranking_menu():
             print(Fore.GREEN + " [1] 通过高考分数查询（一分一段的同分人数、排名区间、累计人数、历史同位次考生得分）")
             print(Fore.GREEN + " [2] 下载2016 - 2024年度的物理类（理科）、历史类（文科）一分一段JSON数据文件")
             print(Fore.GREEN + " [3] 生成一分一段EXCEL文件")
-            print(Fore.GREEN + " [4] 打开一分一段EXCEL文件\n" + Style.RESET_ALL)
+            print(Fore.GREEN + " [4] 生成一分一段折线图")
+            print(Fore.GREEN + " [5] 打开一分一段EXCEL文件\n" + Style.RESET_ALL)
             print(Fore.RED + " [0] 返回上级菜单" + Style.RESET_ALL)
             choice = input("\n请输入选项：")
             if choice == '1':
@@ -366,13 +412,114 @@ def score_ranking_menu():
                 input(Fore.GREEN + "请按 Enter 键返回上级菜单。" + Style.RESET_ALL)
                 os.system("cls" if os.name == "nt" else "clear")  # 清空屏幕命令
             elif choice == '4':
+                # 映射 local_type_id 到 local_type_display_name 的字典
+                local_type_display_name_map = {
+                    2073: '物理类',
+                    2074: '历史类',
+                    1: '理科',
+                    2: '文科'
+                }
+                try:
+                    local_type_id = int(local_type_id)
+                except ValueError:
+                    print(f"Error: local_type_id 的值不正确: {local_type_id}")
+                    local_type_id = None
+                # 获取 local_type_display_name
+                if local_type_id is not None:
+                    local_type_display_name = local_type_display_name_map.get(local_type_id, '未知类型')
+                else:
+                    local_type_display_name = '未知类型'
+                # 读取 Excel 文件
+                province_name = get_province_name(local_province_id)
+                csv_folder = os.path.join("csv", str(province_name))
+                os.makedirs(csv_folder, exist_ok=True)
+                filename = f"一分一段表_{local_type_display_name}_{province_name}_{year}.xlsx"
+                file_path = os.path.join(csv_folder, filename)
+                sheet_name = '一分一段表'
+                # 使用 pandas 读取数据
+                df = pd.read_excel(file_path, sheet_name=sheet_name)
+                # 提取数据
+                x = df.iloc[1:, 1].tolist()  # 从第二行到最后一行的 B 列数据
+                y = df.iloc[1:, 2].tolist()  # 从第二行到最后一行的 C 列数据
+                labels = df.iloc[1:, [1, 2, 3, 5, 7, 9]]  # 从第二行到最后一行的 B、C、D、F、H、J 列数据
+                # 使用 Plotly 绘制图表
+                plt_title_name = f"一分一段折线图 {local_type_display_name} {province_name} {year}"
+                fig = go.Figure()
+                # 添加折线图
+                fig.add_trace(go.Scatter(
+                    x=x,
+                    y=y,
+                    mode='lines+markers',
+                    text=labels.apply(lambda row: '<br>'.join([f"{col}: {val}" for col, val in row.items()]), axis=1),
+                    hoverinfo='text',
+                    line=dict(color='#FF6F00'),
+                    marker=dict(color='#FF6F00')
+                ))
+
+                # 更新布局
+                fig.update_layout(
+                    title=plt_title_name,
+                    xaxis_title='分数',
+                    yaxis_title='同位次人数',
+                    xaxis=dict(
+                        autorange='reversed',
+                        tickvals=[750, 687, 586, 485, 384, 283, 180, 80, 0],
+                        showgrid=True,       # 显示横坐标网格线
+                        gridcolor='lightgray', # 网格线颜色
+                        gridwidth=1          # 网格线宽度
+                    ),
+                    yaxis=dict(
+                        range=[0, max(y) + 100],
+                        showgrid=True,       # 显示横坐标网格线
+                        gridcolor='lightgray', # 网格线颜色
+                        gridwidth=1          # 网格线宽度
+                    ),
+                    font=dict(family='DengXian', size=14, color='black'),
+                    plot_bgcolor='white',
+                    hovermode='closest'
+                )
+
+                # 更新鼠标悬停标签的样式
+                fig.update_traces(
+                    hoverlabel=dict(
+                        bgcolor='gray',         # 背景颜色
+                        font=dict(
+                            family='DengXian', # 字体
+                            size=12,          # 字体大小
+                            color='white',    # 字体颜色
+                            weight='bold'     # 字体加粗
+                        )
+                    )
+                )
+                # 显示图表
+                pio.show(fig)
+                os.system('cls' if os.name == 'nt' else 'clear')
+                break
+            elif choice == '5':
+                # 映射 local_type_id 到 local_type_display_name 的字典
+                local_type_display_name_map = {
+                    2073: '物理类',
+                    2074: '历史类',
+                    1: '理科',
+                    2: '文科'
+                }
+                try:
+                    local_type_id = int(local_type_id)
+                except ValueError:
+                    print(f"Error: local_type_id 的值不正确: {local_type_id}")
+                    local_type_id = None
+                # 获取 local_type_display_name
+                if local_type_id is not None:
+                    local_type_display_name = local_type_display_name_map.get(local_type_id, '未知类型')
+                else:
+                    local_type_display_name = '未知类型'
                 # 获取省份名称
                 province_name = get_province_name(local_province_id)
                 if not province_name:
                     print(Fore.RED + "错误：未找到对应的省份名称。" + Style.RESET_ALL)
                     continue
                 print("正在打开:一分一段表.xlsx文件\n")
-                file_path = os.path.join('csv', str(province_name), f"一分一段表_{local_type_id}_{province_name}{local_province_id}_{year}.xlsx")
+                file_path = os.path.join('csv', str(province_name), f"一分一段表_{local_type_display_name}_{province_name}_{year}.xlsx")
                 print(f"文件路径: {file_path}\n") 
                 if os.path.exists(file_path):
                     try:

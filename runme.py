@@ -1,4 +1,4 @@
-# 编辑于2024-07-24 21:42
+# 编辑于2024-07-25 23:45
 
 import json
 import requests
@@ -441,7 +441,7 @@ def score_ranking_menu():
                 # 提取数据
                 x = df.iloc[1:, 1].tolist()  # 从第二行到最后一行的 B 列数据
                 y = df.iloc[1:, 2].tolist()  # 从第二行到最后一行的 C 列数据
-                labels = df.iloc[1:, [1, 2, 3, 5, 7, 9]]  # 从第二行到最后一行的 B、C、D、F、H、J 列数据
+                labels = df.iloc[1:, [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]]  # 从第二行到最后一行的 B、C、D、E、F、G、H、I、J、K 列数据
                 # 使用 Plotly 绘制图表
                 plt_title_name = f"一分一段折线图 {local_type_display_name} {province_name} {year}"
                 fig = go.Figure()

@@ -1,4 +1,4 @@
-# 编辑于2024-07-25 23:45
+# 编辑于2024-07-26 21:42
 
 import json
 import requests
@@ -13,7 +13,7 @@ import plotly.io as pio
 import colorama
 from colorama import Fore, Style, init
 from openpyxl import Workbook, load_workbook
-from openpyxl.styles import Alignment, PatternFill
+from openpyxl.styles import Alignment, PatternFill, Font
 from openpyxl.utils import get_column_letter
 
 def download_file(url, local_filename):
@@ -117,7 +117,6 @@ def generate_score_ranking_table(filepath, local_type_id, province_name, local_p
     #for row in ws1.iter_rows(min_row=1, max_row=ws1.max_row, min_col=1, max_col=ws1.max_column):
     #    for cell in row:
     #        cell.alignment = Alignment(horizontal='center', vertical='center')
-
     # 添加数据筛选工作表并设置内容
     ws2 = wb.create_sheet(title="数据筛选")
     filter_data = [
@@ -129,12 +128,30 @@ def generate_score_ranking_table(filepath, local_type_id, province_name, local_p
     ]
     for row in filter_data:
         ws2.append(row)
-    for row in ws2.iter_rows(min_row=1, max_row=ws2.max_row, min_col=1, max_col=ws2.max_column):
+    # 设置字体大小和列宽
+    font_large = Font(size=22, bold=True)
+    font_medium = Font(size=14)
+    # 设置居中对齐
+    center_alignment = Alignment(horizontal='center', vertical='center')
+    # 设置第一行字体为大号
+    for cell in ws2[1]:
+        cell.font = font_large
+        cell.alignment = center_alignment
+    # 设置最后一行字体为大号并加粗
+    for cell in ws2[ws2.max_row]:
+        cell.font = font_large
+        cell.alignment = center_alignment
+    # 设置中间行字体为小号
+    for row in ws2.iter_rows(min_row=2, max_row=ws2.max_row - 1):
         for cell in row:
-            cell.alignment = Alignment(horizontal='center', vertical='center')
-    # 将特定单元格设为红色
+            cell.font = font_medium
+            cell.alignment = center_alignment
+    # 将特定单元格设为红色并加粗
     red_fill = PatternFill(start_color="FF0000", end_color="FF0000", fill_type="solid")
     ws2['B5'].fill = red_fill
+    # 设置列宽
+    for col in ws2.columns:
+        ws2.column_dimensions[col[0].column_letter].width = 20
     # 添加一分一段表工作表并设置内容
     ws3 = wb.create_sheet(title="一分一段表")
     title_row = ['分数', '同分人数', '排名区间', '累计人数']
@@ -455,7 +472,6 @@ def score_ranking_menu():
                     line=dict(color='#FF6F00'),
                     marker=dict(color='#FF6F00')
                 ))
-
                 # 更新布局
                 fig.update_layout(
                     title=plt_title_name,
@@ -478,14 +494,37 @@ def score_ranking_menu():
                     plot_bgcolor='white',
                     hovermode='closest'
                 )
-
+                # 添加十字虚线效果
+                fig.update_layout(
+                    xaxis=dict(
+                        showline=True,
+                        linecolor='gray',
+                        linewidth=1,
+                        mirror=True,
+                        #showgrid=False,  # 关闭网格线
+                        zeroline=False,  # 关闭零线
+                        showticksuffix='last'
+                    ),
+                    yaxis=dict(
+                        showline=True,
+                        linecolor='gray',
+                        linewidth=1,
+                        mirror=True,
+                        #showgrid=False,  # 关闭网格线
+                        zeroline=False,  # 关闭零线
+                        showticksuffix='last'
+                    ),
+                    xaxis_title='分数',
+                    yaxis_title='同位次人数',
+                    hovermode='x unified'
+                )
                 # 更新鼠标悬停标签的样式
                 fig.update_traces(
                     hoverlabel=dict(
                         bgcolor='gray',         # 背景颜色
                         font=dict(
                             family='DengXian', # 字体
-                            size=12,          # 字体大小
+                            size=14,          # 字体大小
                             color='white',    # 字体颜色
                             weight='bold'     # 字体加粗
                         )

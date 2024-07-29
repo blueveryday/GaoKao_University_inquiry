@@ -1,4 +1,4 @@
-# 编辑于2024-07-26 21:42
+# 编辑于2024-07-29 23:05
 
 import json
 import requests
@@ -15,6 +15,45 @@ from colorama import Fore, Style, init
 from openpyxl import Workbook, load_workbook
 from openpyxl.styles import Alignment, PatternFill, Font
 from openpyxl.utils import get_column_letter
+
+def merge_csv2xls(province_name, year):
+    # 定义csv文件夹路径
+    csv_folder = os.path.join("csv", str(province_name))
+    os.makedirs(csv_folder, exist_ok=True)
+
+    # 定义不同关键字对应的工作表名
+    sheet_names = {
+        "专业分数线": "专业分数线",
+        "院校分数线": "院校分数线",
+        "开设专业": "开设专业",
+        "招生计划": "招生计划",
+        "学科评估": "学科评估"
+    }
+
+    # 创建一个字典存储每个关键字对应的DataFrame
+    combined_dfs = {key: pd.DataFrame() for key in sheet_names.keys()}
+
+    # 遍历csv文件夹及其子文件夹中的所有文件
+    for root, dirs, files in os.walk("csv"):
+        for file in files:
+            for key in sheet_names.keys():
+                if key in file and file.endswith(".csv"):
+                    file_path = os.path.join(root, file)
+                    # 读取CSV文件
+                    df = pd.read_csv(file_path, encoding='utf-8-sig')
+                    # 将读取的CSV文件内容追加到对应的DataFrame中
+                    combined_dfs[key] = pd.concat([combined_dfs[key], df], ignore_index=True)
+
+    # 定义输出文件路径
+    output_file = os.path.join(csv_folder, f"{year}年高校数据综合统计表.xlsx")
+
+    # 将每个合并后的内容写入新的Excel文件的不同工作表中
+    with pd.ExcelWriter(output_file, engine='openpyxl') as writer:
+        for key, df in combined_dfs.items():
+            df.to_excel(writer, sheet_name=sheet_names[key], index=False)
+        print(f"CSV文件已成功合并到{year}_高校数据综合统计.xlsx文件中。")
+
+    input("按 Enter 键退出...")
 
 def download_file(url, local_filename):
     headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'}
@@ -178,7 +217,6 @@ def generate_score_ranking_table(filepath, local_type_id, province_name, local_p
     # 保存工作簿
     csv_folder = os.path.join("csv", str(province_name))
     os.makedirs(csv_folder, exist_ok=True)
-    
     # 映射 local_type_id 到 local_type_display_name 的字典
     local_type_display_name_map = {
         2073: '物理类',
@@ -981,10 +1019,10 @@ def run_code(choice):
                 # 提取"data"下的"1"数组里的数据
                 for item in data['data'].get('1', []):
                     temp_year = item['year']  # 提取招生年份
-                    nation_feature = "国家特色专业" if item.get(
-                        'nation_feature') == '1' else ''
+                    nation_feature = "国家特色专业" if item.get('nation_feature') == '1' else ''
+                    nation_first_class = "国家一流本科" if item.get('nation_first_class') == '1' else ''
                     extracted_data.add((
-                        school_name,          # 学校ID
+                        school_name,          # 学校名称
                         item['special_name'],       # 专业名称
                         item['type_name'],          # 层次
                         item['level2_name'],        # 学科门类
@@ -992,15 +1030,16 @@ def run_code(choice):
                         item['limit_year'],         # 学制
                         item.get('xueke_rank_score', ''),  # 学科等级
                         nation_feature,             # 国家特色专业
+                        nation_first_class,         # 国家一流本科
                         temp_year                   # 招生年份
                     ))
                 # 提取"special_detail"下的"1"数组里的数据
                 for item in data['data']['special_detail'].get('1', []):
                     temp_year = item['year']  # 提取招生年份
-                    nation_feature = "国家特色专业" if item.get(
-                        'nation_feature') == '1' else ''
+                    nation_feature = "国家特色专业" if item.get('nation_feature') == '1' else ''
+                    nation_first_class = "国家一流本科" if item.get('nation_first_class') == '1' else ''
                     extracted_data.add((
-                        school_name,          # 学校ID
+                        school_name,          # 学校名称
                         item['special_name'],       # 专业名称
                         item['type_name'],          # 层次
                         item['level2_name'],        # 学科门类
@@ -1008,13 +1047,14 @@ def run_code(choice):
                         item['limit_year'],         # 学制
                         item.get('xueke_rank_score', ''),  # 学科等级
                         nation_feature,             # 国家特色专业
+                        nation_first_class,         # 国家一流本科
                         temp_year                   # 招生年份
                     ))
                 # 提取"nation_feature"数组里的数据
                 for item in data['data']['nation_feature']:
                     temp_year = item['year']  # 提取招生年份
-                    nation_feature = "国家特色专业" if item.get(
-                        'nation_feature') == '1' else ''
+                    nation_feature = "国家特色专业" if item.get('nation_feature') == '1' else ''
+                    nation_first_class = "国家一流本科" if item.get('nation_first_class') == '1' else ''
                     extracted_data.add((
                         school_name,                # 学校名称
                         item['special_name'],       # 专业名称
@@ -1024,6 +1064,57 @@ def run_code(choice):
                         item['limit_year'],         # 学制
                         item.get('xueke_rank_score', ''),  # 学科等级
                         nation_feature,             # 国家特色专业
+                        nation_first_class,         # 国家一流本科
+                        temp_year                   # 招生年份
+                    ))
+                for item in data['data'].get('1', []):
+                    temp_year = item['year']  # 提取招生年份
+                    nation_feature = "国家特色专业" if item.get('nation_feature') == '1' else ''
+                    nation_first_class = "国家一流本科" if item.get('nation_first_class') == '1' else ''
+                    extracted_data.add((
+                        school_name,          # 学校名称
+                        item['special_name'],       # 专业名称
+                        item['type_name'],          # 层次
+                        item['level2_name'],        # 学科门类
+                        item['level3_name'],        # 专业类别
+                        item['limit_year'],         # 学制
+                        item.get('xueke_rank_score', ''),  # 学科等级
+                        nation_feature,             # 国家特色专业
+                        nation_first_class,         # 国家一流本科
+                        temp_year                   # 招生年份
+                    ))
+                # 提取"special_detail"下的"1"数组里的数据
+                for item in data['data']['special_detail'].get('1', []):
+                    temp_year = item['year']  # 提取招生年份
+                    nation_feature = "国家特色专业" if item.get('nation_feature') == '1' else ''
+                    nation_first_class = "国家一流本科" if item.get('nation_first_class') == '1' else ''
+                    extracted_data.add((
+                        school_name,          # 学校名称
+                        item['special_name'],       # 专业名称
+                        item['type_name'],          # 层次
+                        item['level2_name'],        # 学科门类
+                        item['level3_name'],        # 专业类别
+                        item['limit_year'],         # 学制
+                        item.get('xueke_rank_score', ''),  # 学科等级
+                        nation_feature,             # 国家特色专业
+                        nation_first_class,             # 国家一流本科
+                        temp_year                   # 招生年份
+                    ))
+                # 提取"nation_feature"数组里的数据
+                for item in data['data']['nation_feature']:
+                    temp_year = item['year']  # 提取招生年份
+                    nation_feature = "国家特色专业" if item.get('nation_feature') == '1' else ''
+                    nation_first_class = "国家一流本科" if item.get('nation_first_class') == '1' else ''
+                    extracted_data.add((
+                        school_name,                # 学校名称
+                        item['special_name'],       # 专业名称
+                        item['type_name'],          # 层次
+                        item['level2_name'],        # 学科门类
+                        item['level3_name'],        # 专业类别
+                        item['limit_year'],         # 学制
+                        item.get('xueke_rank_score', ''),  # 学科等级
+                        nation_feature,             # 国家特色专业
+                        nation_first_class,         # 国家一流本科
                         temp_year                   # 招生年份
                     ))
                 # 在 choice == 4 分支中，使用临时变量存储 year 的值
@@ -1035,9 +1126,9 @@ def run_code(choice):
                 file_path = os.path.join(school_subfolder, file_name)
                 # 将数据写入 CSV 文件
                 with open(file_path, mode='w', newline='', encoding='utf-8-sig') as file:
-                    csv.writer(file).writerows([['学校ID', '专业名称', '层次', '学科门类', '专业类别', '学制', '学科等级', '国家特色专业', '开设专业年份']] + list(extracted_data))
+                    csv.writer(file).writerows([['学校名称', '专业名称', '层次', '学科门类', '专业类别', '学制', '学科等级', '国家特色专业', '国家一流本科', '开设专业年份']] + list(extracted_data))
                 # print(f"数据已成功保存到 {file_path} 文件中。")
-                # #显示文件保存的绝对路径
+                # 显示文件保存的绝对路径
                 print(f"数据已成功保存到 {os.path.relpath(file_path)} 文件中。")  # 显示文件保存的相对路径
             else:
                 print("请求失败。")
@@ -1111,14 +1202,14 @@ def run_code(choice):
                 for item in items:
                     xueke_name = item['xueke_name']  # 学科名称
                     xueke_rank_score = item['xueke_rank_score']  # 评估等级
-                    extracted_data.append([xueke_name, xueke_rank_score])
+                    extracted_data.append([school_name, xueke_name, xueke_rank_score])
                 # 定义文件名
                 file_name = f"{school_name}_学校代码{school_id}_{province_name}{local_province_id}_{year}_{'_'.join(round_info)}学科评估.csv"
                 file_path = os.path.join(school_subfolder, file_name)
                 # 将数据写入 CSV 文件
                 with open(file_path, mode='w', newline='', encoding='utf-8-sig') as file:
                     writer = csv.writer(file)
-                    writer.writerow(['学科', '评估'])
+                    writer.writerow(['学校名称', '学科', '评估等级'])
                     writer.writerows(extracted_data)
                 # print(f"数据已成功保存到 {file_path} 文件中。")
                 # #显示文件保存的绝对路径
@@ -1252,6 +1343,11 @@ def run_code(choice):
             input("按 Enter 键继续...")
             break
         elif choice == 12:
+            #os.system('cls' if os.name == 'nt' else 'clear')
+            province_name = get_province_name(local_province_id)
+            merge_csv2xls(province_name, year)
+            break
+        elif choice == 13:
             def csv_save_as_xlsx(data_path, output_path):
                 for dirpath, dirnames, filenames in os.walk(data_path):
                     for fname in filenames:
@@ -1266,8 +1362,8 @@ def run_code(choice):
                             # 构建新文件路径
                             new_file_path = os.path.join(new_dir, f"{os.path.splitext(fname)[0]}.xlsx")
                             df.to_excel(new_file_path, index=False)
-                            print(f'{file_name} 转换为 {new_file_path} 成功')
-                            print('=========================================')
+                            #print(f'{file_name} 转换为 {new_file_path} 成功')
+                            #print('=========================================')
             # 获取当前脚本所在目录
             current_dir = os.path.dirname(os.path.abspath(__file__))
             # 将 data_path 设置为当前目录下的 csv 文件夹
@@ -1275,7 +1371,7 @@ def run_code(choice):
             # 将 output_path 设置为当前目录下的 xlsx 文件夹
             output_path = os.path.join(current_dir, "xlsx")
             csv_save_as_xlsx(data_path, output_path) 
-            input("\n转换完成，按 Enter 键继续...")
+            input("\n文件转换完成，按 Enter 键继续...")
             break
         elif choice == 0:
             return  # Exiting the function, which effectively returns to the main menu
@@ -1344,7 +1440,8 @@ def main():
         print(Fore.GREEN + " [9] 查询一分一段\n")
         print(Fore.CYAN + " [10] 清空download文件夹")
         print(Fore.CYAN + " [11] 更新学校id(默认不需要执行)\n" + Style.RESET_ALL)
-        print(Fore.GREEN + " [12] 将CSV文件批量转换成XLSX文件\n" + Style.RESET_ALL)
+        print(Fore.GREEN + " [12] 合并下载的专业分数线、院校分数线、开设专业、招生计划、学科评估数据" + Style.RESET_ALL)
+        print(Fore.GREEN + " [13] 将CSV文件批量转换成XLSX文件\n" + Style.RESET_ALL)
         print(Fore.RED + " [0] 退出\n" + Style.RESET_ALL)
         print("=========================================\n")
         try:

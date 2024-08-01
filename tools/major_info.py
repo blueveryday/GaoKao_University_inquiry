@@ -1,4 +1,4 @@
-# 批量处理../src/special中的json专业数据文件
+# 批量处理../src/special/info中的json专业数据文件
 import os
 import json
 import pandas as pd
@@ -47,10 +47,10 @@ def save_to_excel(base_folder, output_excel_file):
                     degree = item.get('degree', '未知授予学位')
                     boy_rate = item.get('boy_rate', '0')
                     girl_rate = item.get('girl_rate', '0')
-                    fivesalaryavg = item.get('fivesalaryavg', '未知平均薪酬')
+                    fivesalaryavg = item.get('fivesalaryavg', '未知平均月薪')
                     salaryavg = item.get('salaryavg', '未知平均年薪')
                     special_id = item.get('special_id', '未知')
-                    school_url = f"https://www.gaokao.cn/special/{special_id}?special_type=3"
+                    special_sunmmary = f"https://www.gaokao.cn/special/{special_id}?special_type=1"
 
                     # 确保将所有数值类型转换为字符串，然后再进行检查
                     if isinstance(fivesalaryavg, (int, float)):
@@ -73,7 +73,7 @@ def save_to_excel(base_folder, output_excel_file):
                         gender_ratio,  # 直接写入男女比例，用双引号括起来
                         fivesalaryavg if fivesalaryavg.replace('.', '', 1).isdigit() else None,
                         salaryavg if salaryavg.replace('.', '', 1).isdigit() else None,
-                        school_url
+                        special_sunmmary
                     ])
 
     # 创建目标文件夹路径
@@ -83,12 +83,11 @@ def save_to_excel(base_folder, output_excel_file):
 
     # 创建一个DataFrame并写入Excel文件
     df = pd.DataFrame(all_data, columns=[
-        "专业层次", "专业门类", "专业大类", "专业名称", "专业代码", "修业年限", 
-        "授予学位", "男女比例", "平均薪酬", "平均年薪", "开设院校"
+        "专业层次", "专业门类", "专业大类", "专业名称", "专业代码", "修业年限", "授予学位", "男女比例", "平均月薪", "平均年薪", "专业详解"
     ])
     
-    # 将"平均薪酬"和"平均年薪"列转换为数值格式，非数字值将被设置为NaN
-    df['平均薪酬'] = pd.to_numeric(df['平均薪酬'], errors='coerce')
+    # 将"平均月薪"和"平均年薪"列转换为数值格式，非数字值将被设置为NaN
+    df['平均月薪'] = pd.to_numeric(df['平均月薪'], errors='coerce')
     df['平均年薪'] = pd.to_numeric(df['平均年薪'], errors='coerce')
     
     # 将"专业代码"列转换为文本格式
@@ -121,9 +120,9 @@ def save_to_excel(base_folder, output_excel_file):
         'E': '专业代码',
         'F': '修业年限',
         'H': '男女比例',
-        'I': '平均薪酬',
+        'I': '平均月薪',
         'J': '平均年薪',
-        'K': '开设院校'
+        'K': '专业详解'
     }
 
     for col_letter, header_name in header_titles.items():
@@ -151,10 +150,11 @@ def save_to_excel(base_folder, output_excel_file):
         for cell in ws[col]:
             cell.alignment = center_alignment
 
-    # 对"K"列设置右对齐
-    for cell in ws['K']:
-        cell.alignment = right_alignment
-        cell.style = number_format_style
+    # 对"K"和"L"列设置右对齐
+    for col in ['K']:
+        for cell in ws[col]:
+            cell.alignment = right_alignment
+            cell.style = number_format_style
 
     # 将"开设院校"列的数据设置为链接
     for row in ws.iter_rows(min_row=2, max_col=11, max_row=ws.max_row):
@@ -178,6 +178,6 @@ def save_to_excel(base_folder, output_excel_file):
     input("按 Enter 退出")
 
 # 设置基本路径为../src/special，Excel文件保存到../csv/专业数据/专业数据.xlsx
-base_folder = '../src/special_info'
-output_excel_file = '../csv/专业数据/2024年专业数据汇总.xlsx'
+base_folder = '../src/special/info'
+output_excel_file = '../csv/专业数据/2024年_Major_Info.xlsx'
 save_to_excel(base_folder, output_excel_file)

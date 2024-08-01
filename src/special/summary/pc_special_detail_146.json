@@ -1,0 +1,515 @@
+{
+    "code": "0000",
+    "data": {
+        "action_special": [
+        ],
+        "action_type": "0",
+        "celebrity": "胡国栋、钟佩思、陈志新等。",
+        "code": "080201",
+        "content": "<p>    培养目标：机械工程是一个宽口径的机械类专业。本专业培养具有宽厚的机械工程基本理\r\n论和基础知识，能在机械工程领域从事工程设计、机械制造、技术开发、科学研究、生产组织管理\r\n等方面工作的复合型高级工程技术人才。\r\n</p><p>    培养要求：本专业学生主要学习数学和其他相关的自然科学知识以及机械设计、机械制造、\r\n控制的基本理论和基本知识，接受机械工程师的基本训练，具备在机械工程领域里从事设计、制\r\n造、技术开发、科学研究、生产组织与管理的基本能力。\r\n</p><p>    毕业生应获得以下几方面的知识和能力：\r\n</p><p>    1．掌握从事机械工程工作所需的数学和其他相关的自然科学知识以及一定的经济管理\r\n知识；\r\n</p><p>    2．掌握机械工程基础理论和专业知识，了解机械工程前沿发展现状和趋势；\r\n</p><p>    3．具有综合运用所学科学理论和技术方法对于机械工程问题进行系统表达、建立模型、综\r\n合分析并提出解决方案的基本能力；\r\n</p><p>    4．掌握在机械工程实践中基本工艺操作等各种技术、技能，具有使用现代化工程工具的\r\n能力；\r\n</p><p>    5．具有较强的创新意识和对机械工业新产品、新工艺、新技术和新设备进行研究、开发和设\r\n计的初步能力；\r\n</p><p>    6．具有较好的人文社会科学素养、较强的社会责任感，较强的语言文字表达能力、团队合作\r\n精神、一定的组织管理能力和良好的工程职业道德；\r\n</p><p>    7．了解与机械工程相关的法律、法规，具有环境保护和可持续发展等方面的意识，具有一定\r\n的国际视野，正确认识机械工程对于客观世界和社会的影响；\r\n</p><p>    8．具有终身教育的意识和继续学习的能力。\r\n</p><p>    主干学科：机械工程、力学、动力工程及工程热物理。\r\n</p><p>    核心知识领域：工程图学、工程力学、流体力学、传热学、工程热力学、电工电子学、控制工程\r\n基础、工程材料及成型基础、机械设计基础、机械制造工程与技术、机电传动与控制等。\r\n</p><p>    主要实践性教学环节：金工实习、课程实验、课程设计、生产实习、科技创新与社会实践、毕业\r\n实习、毕业设计（论文）等。\r\n</p><p>    主要专业实验：工程力学实验、机械设计基础实验、工程测控实验、电工与电子技术实验、传\r\n动与控制技术实验、机械制造基础实验、互换性测量技术基础实验、材料成型技术基础实验、制造\r\n装备和过程自动化技术实验。\r\n</p><p>    修业年限：四年。\r\n</p><p>    授予学位：工学学士。\r\n</p>",
+        "continue_exp": "",
+        "course": "机械工程制图、电工与电子技术应用、机电设备自动检测、机械结构分析、液压系统应用与维护、机械制造技术、数控设备操作与维护、机械系统安装与调试、设备电气控制与修理、现代设备管理、机电设备故障诊断与维修等。",
+        "degree": "工学学士",
+        "direction": "机械工程、机械设计及理论、机械制造及其自动化、机械电子工程、车辆工程",
+        "do_what": "机械、技术类企业：机械设计、机械制造、机电产品研发、机电自控系统开发、数控设备开发、智能系统设计。",
+        "e_status": "2",
+        "heat": {
+            "id": "146",
+            "special_id": "146",
+            "view_month": "11451",
+            "view_total": "1307982"
+        },
+        "id": "146",
+        "impress": [
+            {
+                "id": "161",
+                "img_url": "/upload/special_images/1552708157_4933_thumb.jpg",
+                "key_word": "电器",
+                "special_id": "146"
+            },
+            {
+                "id": "162",
+                "img_url": "/upload/special_images/1552708157_5016_thumb.jpg",
+                "key_word": "机器人",
+                "special_id": "146"
+            },
+            {
+                "id": "163",
+                "img_url": "/upload/special_images/1552708157_5672_thumb.jpg",
+                "key_word": "汽车",
+                "special_id": "146"
+            },
+            {
+                "id": "164",
+                "img_url": "/upload/special_images/1552708157_3837_thumb.jpg",
+                "key_word": "起重机",
+                "special_id": "146"
+            }
+        ],
+        "is_cancel": "2",
+        "is_what": "机械工程以有关的自然科学和技术科学为理论基础，结合生产实践中的技术经验，研究和解决在开发、设计、制造、安装、运用和修理各种机械中遇到的实际问题，例如：家用电器的维修、汽车的改装、智能机器人的研发设计、挖掘机的使用等。\n关键词：电器  机器人  汽车  起重机",
+        "job": "<p>\t\t就业方向：国家有关部门、科研院所、高等院校、企业、高新技术公司应用CAD及分析软件从事各种机电产品及机电自动控制系统及设备的研究、设计、制造，如：进行工业机器人、微机电系统、智能装置等高新技术产品与系统的设计、制造、开发、试验与研究工作。</p>",
+        "jobbsgs": 38.9,
+        "jobdetail": {
+            "1": [
+                {
+                    "area": "",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "1446",
+                    "name": "机械重工",
+                    "rate": "29.61",
+                    "sort": "2961",
+                    "special_id": "146",
+                    "type": "1"
+                },
+                {
+                    "area": "",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "1447",
+                    "name": "汽车",
+                    "rate": "13.07",
+                    "sort": "1307",
+                    "special_id": "146",
+                    "type": "1"
+                },
+                {
+                    "area": "",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "1450",
+                    "name": "房地产",
+                    "rate": "6.07",
+                    "sort": "607",
+                    "special_id": "146",
+                    "type": "1"
+                },
+                {
+                    "area": "",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "1449",
+                    "name": "加工制造",
+                    "rate": "5.46",
+                    "sort": "546",
+                    "special_id": "146",
+                    "type": "1"
+                },
+                {
+                    "area": "",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "1448",
+                    "name": "电子技术",
+                    "rate": "4.74",
+                    "sort": "474",
+                    "special_id": "146",
+                    "type": "1"
+                },
+                {
+                    "area": "",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "1452",
+                    "name": "石油化工",
+                    "rate": "3.96",
+                    "sort": "396",
+                    "special_id": "146",
+                    "type": "1"
+                },
+                {
+                    "area": "",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "1451",
+                    "name": "自动化",
+                    "rate": "3.56",
+                    "sort": "356",
+                    "special_id": "146",
+                    "type": "1"
+                },
+                {
+                    "area": "",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "1453",
+                    "name": "采掘冶炼",
+                    "rate": "3.55",
+                    "sort": "355",
+                    "special_id": "146",
+                    "type": "1"
+                },
+                {
+                    "area": "",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "1454",
+                    "name": "电信设备",
+                    "rate": "0.35",
+                    "sort": "35",
+                    "special_id": "146",
+                    "type": "1"
+                },
+                {
+                    "area": "",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "1455",
+                    "name": "其他行业",
+                    "rate": "29.63",
+                    "sort": "0",
+                    "special_id": "146",
+                    "type": "1"
+                }
+            ],
+            "2": [
+                {
+                    "area": "上海市",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "14097",
+                    "name": "",
+                    "rate": "15.10",
+                    "sort": "1510",
+                    "special_id": "146",
+                    "type": "2"
+                },
+                {
+                    "area": "华东地区",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "14096",
+                    "name": "",
+                    "rate": "14.80",
+                    "sort": "1480",
+                    "special_id": "146",
+                    "type": "2"
+                },
+                {
+                    "area": "北京市",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "14093",
+                    "name": "",
+                    "rate": "13.10",
+                    "sort": "1310",
+                    "special_id": "146",
+                    "type": "2"
+                },
+                {
+                    "area": "深圳市",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "14098",
+                    "name": "",
+                    "rate": "5.90",
+                    "sort": "590",
+                    "special_id": "146",
+                    "type": "2"
+                },
+                {
+                    "area": "广州市",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "14094",
+                    "name": "",
+                    "rate": "4.80",
+                    "sort": "480",
+                    "special_id": "146",
+                    "type": "2"
+                },
+                {
+                    "area": "华北地区",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "14095",
+                    "name": "",
+                    "rate": "3.10",
+                    "sort": "310",
+                    "special_id": "146",
+                    "type": "2"
+                },
+                {
+                    "area": "西南地区",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "14099",
+                    "name": "",
+                    "rate": "0.20",
+                    "sort": "20",
+                    "special_id": "146",
+                    "type": "2"
+                },
+                {
+                    "area": "其他地区",
+                    "detail_job": "",
+                    "detail_pos": "",
+                    "id": "14100",
+                    "name": "",
+                    "rate": "43.00",
+                    "sort": "0",
+                    "special_id": "146",
+                    "type": "2"
+                }
+            ],
+            "3": [
+                {
+                    "area": "",
+                    "detail_job": "项目工程师，机械研发工程师，机械制图员，助理工程师，技术员，模具工程师，机电工程师，实习生，机械设计，工程/设备工程师",
+                    "detail_pos": "机械设计/制造",
+                    "id": "8684",
+                    "name": "办公用品，保险，餐饮娱乐，电力水利",
+                    "rate": "21.00",
+                    "sort": "2100",
+                    "special_id": "146",
+                    "type": "3"
+                },
+                {
+                    "area": "",
+                    "detail_job": "区域销售专员/助理，网络/在线销售，销售主管，区域销售总监，大客户管理，渠道/分销经理，高级客户经理，业务主管，渠道/分销主管，大客户销售经理",
+                    "detail_pos": "销售业务",
+                    "id": "8685",
+                    "name": "办公用品，保险，餐饮娱乐，电力水利",
+                    "rate": "7.80",
+                    "sort": "780",
+                    "special_id": "146",
+                    "type": "3"
+                },
+                {
+                    "area": "",
+                    "detail_job": "工艺员，工艺/制程工程师，技术员，工业工程师，生产工程师，技术研发工程师，生产技术工程师，机械工艺/制程工程师，实习生，液压工程师",
+                    "detail_pos": "生产工艺",
+                    "id": "8687",
+                    "name": "办公用品，电力水利，电子技术，房地产",
+                    "rate": "6.60",
+                    "sort": "660",
+                    "special_id": "146",
+                    "type": "3"
+                },
+                {
+                    "area": "",
+                    "detail_job": "项目工程师，项目经理/项目主管，项目专员/助理，项目经理，项目总监，项目经理/主管，工程机械主管，项目管理，项目助理，项目主管",
+                    "detail_pos": "项目管理/协调",
+                    "id": "8688",
+                    "name": "办公用品，保险，餐饮娱乐，电力水利",
+                    "rate": "4.40",
+                    "sort": "440",
+                    "special_id": "146",
+                    "type": "3"
+                },
+                {
+                    "area": "",
+                    "detail_job": "技术工程师，结构助理工程师，开发工程师，产品工艺/制程工程师，机械结构工程师，产品研发工程师，产品开发工程师，机构设计工程师，结构设计员，结构设计师",
+                    "detail_pos": "电子/电器通用技术",
+                    "id": "8686",
+                    "name": "办公用品，餐饮娱乐，电力水利，电子技术",
+                    "rate": "4.20",
+                    "sort": "420",
+                    "special_id": "146",
+                    "type": "3"
+                },
+                {
+                    "area": "",
+                    "detail_job": "项目工程管理，汽车安全性能工程师，车身工程师，应用工程师，项目管理，其他，汽车电子工程师，产品开发/技术/工艺，发动机/总装工程师，汽车/摩托车工程师",
+                    "detail_pos": "其他",
+                    "id": "8689",
+                    "name": "电力水利，电子技术，房地产，服装",
+                    "rate": "56.00",
+                    "sort": "0",
+                    "special_id": "146",
+                    "type": "3"
+                }
+            ]
+        },
+        "jobrate": [
+            {
+                "id": "1818",
+                "rate": "71%-75%",
+                "special_id": "146",
+                "year": "2021"
+            },
+            {
+                "id": "1819",
+                "rate": "79%-89%",
+                "special_id": "146",
+                "year": "2022"
+            },
+            {
+                "id": "1820",
+                "rate": "86%-94%",
+                "special_id": "146",
+                "year": "2023"
+            }
+        ],
+        "learn_what": "《C++程序设计与实践》、《控制系统工程》、《机械制造与装备》、《CAO与机械元器件》、《材料成形技术》、《工程材料与应用》、《汽车结构与设计》、《现代机械制造技术》、《力学测试及误差分析》、《电工和电子技术》\n部分高校按以下专业方向培养：数控技术、港口机械工程、高分子加工机械、机械设计与制造、模具设计与制造、机械设计制造及自动化。",
+        "level1": "1",
+        "level1_name": "本科",
+        "level2": "10",
+        "level3": "64",
+        "limit_year": "四年",
+        "mostemployedeposition": "机械设计/制造",
+        "mostemploymentarea": "上海市",
+        "mostemploymentindustry": "机械重工",
+        "name": "机械工程",
+        "professionalsalary": {
+            "allmajorsalaryavg": [
+                6000,
+                7700,
+                10400,
+                14600
+            ],
+            "majorsalaryavg": [
+                6100,
+                7900,
+                13300,
+                20200
+            ],
+            "salaryavg": 13300
+        },
+        "rate": "91.00:9.00",
+        "rate2": "1:99",
+        "salaryavg": 101754,
+        "samename": {
+        },
+        "samenamearr": [
+        ],
+        "sel_adv": "物理+化学",
+        "skill": "",
+        "specialschool": [
+            "清华大学",
+            "上海交通大学",
+            "西安交通大学",
+            "北京理工大学"
+        ],
+        "status": "1",
+        "tag": "1",
+        "type": "工学",
+        "type_detail": "机械类",
+        "video": [
+            {
+                "id": "2709",
+                "img_url": "/upload/spvideo/1703474655_4694_thumb.jpg",
+                "rank": "0",
+                "school_id": "381",
+                "school_special_id": "19641",
+                "title": "长春工业大学机械工程专业解读",
+                "update_time": "2024-05-06 16:12:00",
+                "url": "http://vod.zjzw.cn/h3270835014184108421/3ie07ikn3brkd5i0qgz7wykahz8wyel9.mp4",
+                "url_type": 2
+            },
+            {
+                "id": "2236",
+                "img_url": "/upload/spvideo/1686211355_4003_thumb.jpg",
+                "rank": "0",
+                "school_id": "1298",
+                "school_special_id": "747983",
+                "title": "北京理工大学珠海学院机械工程专业解读",
+                "update_time": "2024-05-06 16:12:00",
+                "url": "http://vod.zjzw.cn/h3270835009558022998/g9vplf355x8fdxczndnwm35ki9qqdc48.mp4",
+                "url_type": 2
+            },
+            {
+                "id": "1710",
+                "img_url": "/upload/spvideo/1627033325_5369_thumb.jpg",
+                "rank": "8",
+                "school_id": "1214",
+                "school_special_id": "153742",
+                "title": "集美大学诚毅学院机械工程专业解读",
+                "update_time": "2024-05-06 16:12:00",
+                "url": "http://vod.zjzw.cn/h3701925921282443454/cxxjx0nwf8ud6m8xjkwcdwxy5uesq7yv.mp4",
+                "url_type": 2
+            },
+            {
+                "id": "1517",
+                "img_url": "/upload/spvideo/1624691415_9996_thumb.png",
+                "rank": "0",
+                "school_id": "1419",
+                "school_special_id": "48441",
+                "title": "长春工业大学人文信息学院机械工程专业视频解读",
+                "update_time": "2024-05-06 16:12:00",
+                "url": "http://vod.zjzw.cn/h3701925919538477794/njryiv2pnbjq5un4fehm2ixpj4h8hnm1.mp4",
+                "url_type": 2
+            },
+            {
+                "id": "1502",
+                "img_url": "/upload/spvideo/1684203993_7034_thumb.jpg",
+                "rank": "0",
+                "school_id": "3241",
+                "school_special_id": "1562132",
+                "title": "广东以色列理工学院机械工程与机器人专业视频",
+                "update_time": "2024-05-06 16:12:00",
+                "url": "http://vod.zjzw.cn/h3270835009047095633/0si00yp11crhln5y4b0z5oe35jh7lbno.mp4",
+                "url_type": 2
+            },
+            {
+                "id": "1222",
+                "img_url": "/upload/spvideo/1623219782_3575_thumb.png",
+                "rank": "0",
+                "school_id": "135",
+                "school_special_id": "6954",
+                "title": "东华大学-机械工程专业视频解读",
+                "update_time": "2024-05-06 16:12:00",
+                "url": "http://vod.zjzw.cn/h3701925919087901602/5279kkwaq21nykoxt9lnoy2t91nlkvk5.mp4",
+                "url_type": 2
+            },
+            {
+                "id": "1045",
+                "img_url": "/upload/spvideo/1621415971_8136_thumb.png",
+                "rank": "0",
+                "school_id": "351",
+                "school_special_id": "18090",
+                "title": "西安建筑科技大学机械工程专业视频解读",
+                "update_time": "2024-05-06 16:12:00",
+                "url": "http://vod.zjzw.cn/h5285890818577382157/n0onmcuci2wvc79wykxh0mv1chxqcw9m.mp4",
+                "url_type": 2
+            },
+            {
+                "id": "819",
+                "img_url": "/upload/spvideo/1606269632_6534_thumb.png",
+                "rank": "0",
+                "school_id": "86",
+                "school_special_id": "3507",
+                "title": "江南大学机械工程专业视频解读",
+                "update_time": "2024-05-06 16:12:00",
+                "url": "http://vod.zjzw.cn/h5285890810383289001/ecthbggk4z3eraq6727sl3sh7mhbwhr2.mp4",
+                "url_type": 2
+            },
+            {
+                "id": "732",
+                "img_url": "/upload/spvideo/1596176937_4205_thumb.png",
+                "rank": "0",
+                "school_id": "377",
+                "school_special_id": "172760",
+                "title": "长春大学机械工程（中外合作办学）专业解读",
+                "update_time": "2024-05-06 16:12:00",
+                "url": "http://vod.zjzw.cn/h5285890805887136478/meebz0qy8o6st3wr24tgo2lrw9qvcu8s.mp4",
+                "url_type": 2
+            },
+            {
+                "id": "416",
+                "img_url": "/upload/spvideo/1587362673_6191_thumb.png",
+                "rank": "0",
+                "school_id": "377",
+                "school_special_id": "19474",
+                "title": "机械工程专业视频",
+                "update_time": "2024-05-06 16:12:00",
+                "url": "http://vod.zjzw.cn/h5285890801435078746/yov9ogkc7m8rk2722jyg3qtjmm2a9puz.mp4",
+                "url_type": 2
+            },
+            {
+                "id": "128",
+                "img_url": "/upload/spvideo/1607335097_6392_thumb.png",
+                "rank": "18",
+                "school_id": "330",
+                "school_special_id": "16702",
+                "title": "机械工程专业解读",
+                "update_time": "2024-05-06 16:12:00",
+                "url": "http://vod.zjzw.cn/h7447398155416687209/n5bq55gad4pe6r8464t6ctuqzh2oge5o.mp4",
+                "url_type": 2
+            }
+        ]
+    },
+    "md5": "20bef857da3cf47d9bda2c569e119b04",
+    "message": "成功"
+}

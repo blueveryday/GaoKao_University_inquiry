@@ -1,4 +1,4 @@
-# 编辑于2024-07-29 23:05
+# 编辑于2024-11-01 20:45
 
 import json
 import requests
@@ -288,6 +288,411 @@ def download_json(year, local_province_id, local_type_id):
         print(f"JSON 文件已下载至 {filepath}")
     else:
         print("\nJSON文件下载失败，请访问https://www.gaokao.cn/colleges/bypart 查看各省分有效的查询年份，并重新输入年份下载，或者检查你的网络连接是否正常。\n")
+
+def batch_alldata():
+    init(autoreset=True)
+    province_id_name_mapping = {
+        "11": "北京", "12": "天津", "13": "河北", "14": "山西", "15": "内蒙古",
+        "21": "辽宁", "22": "吉林", "23": "黑龙江", "31": "上海", "32": "江苏",
+        "33": "浙江", "34": "安徽", "35": "福建", "36": "江西", "37": "山东",
+        "41": "河南", "42": "湖北", "43": "湖南", "44": "广东", "45": "广西",
+        "46": "海南", "50": "重庆", "51": "四川", "52": "贵州", "53": "云南",
+        "54": "西藏", "61": "陕西", "62": "甘肃", "63": "青海", "64": "宁夏",
+        "65": "新疆",
+    }
+    
+    type_mapping = {
+        "2073": "物理类", "2074": "历史类", "1": "理科", "2": "文科"
+    }
+    
+    src_folder = "src"
+    download_folder = "download"
+    excel_folder = "excel"
+    base_url_special_score = 'https://static-data.gaokao.cn/www/2.0/schoolspecialscore'
+    base_url_province_score = 'https://static-data.gaokao.cn/www/2.0/schoolprovincescore'
+    base_url_special_plan = 'https://static-data.gaokao.cn/www/2.0/schoolspecialplan'
+    base_url_pc_special = 'https://static-data.gaokao.cn/www/2.0/school'
+    base_url_xk_rank = 'https://static-data.gaokao.cn/www/2.0/school'
+    
+    print("用法：")
+    print("源文件位于src文件中，以985，211，b1（双一流），custom命名。")
+    print("custom为自定义学校下载文件，使用前先修改custom文件中的学校名称和学校代码内容！\n")
+    while True:
+        file_choice = input(Fore.GREEN + "请选择批量下载的源文件" + Fore.RED + "（输入 '985'、'211' 、'd1'或 'custom'，默认为 '985'）：" + Style.RESET_ALL) or '985'
+        if file_choice in ["985", "211", "d1", "custom"]:
+            break
+        else:
+            print(Fore.RED + "无效输入！只能输入 '985'、'211' 、'd1'或 'custom'" + Style.RESET_ALL)
+    
+    while True:
+        year = input(Fore.GREEN + "请输入招生年份" + Fore.RED + "(默认为 2024)：" + Style.RESET_ALL) or "2024"
+        if year.isdigit() and int(year) >= 2000: 
+            break
+        else:
+            print(Fore.RED + "无效输入！请重新输入有效的年份。" + Style.RESET_ALL)
+    
+    while True:
+        local_province_id = input(Fore.GREEN + "请输入省市区代码" + Fore.RED + "(默认为 50)：" + Style.RESET_ALL) or "50"
+        if local_province_id in province_id_name_mapping:
+            break
+        else:
+            print(Fore.RED + "无效的省市区代码！请重新输入。" + Style.RESET_ALL)
+    
+    src_file_name = f"{file_choice}.txt"
+    
+    province_name = province_id_name_mapping.get(local_province_id)
+    os.makedirs(download_folder, exist_ok=True)
+    os.makedirs(os.path.join(excel_folder, province_name), exist_ok=True)
+    
+    def read_school_ids(file_path):
+        school_ids = {}
+        with open(file_path, 'r', encoding='utf-8') as f:
+            for line in f:
+                name, school_id = line.strip().split(',')
+                school_ids[school_id] = name
+        return school_ids
+    
+    def download_file(url, file_path):
+        try:
+            response = requests.get(url)
+            response.raise_for_status()
+            with open(file_path, 'wb') as f:
+                f.write(response.content)
+            return True
+        except Exception as e:
+            print(f"下载失败: {e}")
+            return False
+    
+    # 专业分数线
+    def process_json_to_dataframe(content, school_name, school_id, province_name, year):
+        items = []
+        for type_id, type_data in content.get('data', {}).items():
+            if 'item' in type_data:
+                for item in type_data['item']:
+                    items.append({
+                        "学校名称": school_name,
+                        "省市区": province_name,
+                        "招生年份": int(year),
+                        "类型": type_mapping.get(item.get('type', '-'), item.get('type', '-')),
+                        "录取批次": item.get('local_batch_name', '-'),
+                        "专业名称": item.get('spname', '-'),
+                        "最低分": item.get('min', '-'),
+                        "最低位次": int(item.get('min_section', '-')) if item.get('min_section', '').isdigit() else item.get('min_section', '-'),
+                        "选课要求": item.get('sp_info', '-')
+                    })
+        return pd.DataFrame(items)
+    
+    # 省市分数线
+    def process_province_score(content, school_name, school_id, year, local_province_id):
+        if content.get("numFound") == 0 or content.get("code") == "0003":
+            print("年份错误，非开启年。请重新输入年份！")
+            return pd.DataFrame()
+    
+        items = []
+        for type_id, type_data in content['data'].items():
+            if 'item' in type_data:
+                items.extend(type_data['item'])
+        
+        if not items:
+            print("未找到任何数据，请检查下载文件并重试。")
+            return pd.DataFrame()
+    
+        records = []
+        for item in items:
+            item_province_id = item.get('province_id', '-')
+            province_name = province_id_name_mapping.get(item_province_id, "未知省份")
+            item_type = item.get('type', '-')
+            
+            item_type_name = type_mapping.get(item_type, item_type)
+            
+            records.append([
+                school_name,
+                item.get('year', '-'),
+                province_name,
+                item_type_name,
+                item.get('min', '-'),
+                item.get('min_section', '-'),
+                item.get('local_batch_name', '-'),
+                item.get('zslx_name', '-'),
+                item.get('proscore', '-')
+            ])
+        
+        df = pd.DataFrame(records, columns=[
+            "学校名称", "招生年份", "省市区", "文理科类型", 
+            "最低分", "最低位次", "录取批次", "招生类型", "省控线"
+        ])
+    
+        df['招生年份'] = pd.to_numeric(df['招生年份'], errors='coerce')
+        df['最低分'] = pd.to_numeric(df['最低分'], errors='coerce')
+        df['最低位次'] = pd.to_numeric(df['最低位次'], errors='coerce')
+        df['省控线'] = pd.to_numeric(df['省控线'], errors='coerce')
+    
+        return df
+    
+    # 招生计划
+    def process_special_plan_json(content, school_name, school_id, province_name, year):
+        items = []
+        year_num = int(year) if year.isdigit() else None
+    
+        if 'data' in content:
+            for key, value in content['data'].items():
+                if 'item' in value:
+                    for item in value['item']:
+                        if isinstance(item, dict):
+                            length = str(item.get('length', '-'))
+                            tuition_str = item.get('tuition', '-')
+                            tuition = int(tuition_str) if tuition_str.isdigit() else 0
+                            
+                            if length == '4':
+                                length = '四年'
+    
+                            items.append({
+                                "学校名称": school_name,
+                                "省市区": province_name,
+                                "招生年份": year_num if year_num is not None else year,
+                                "专业名称": item.get('sp_name', '-'),
+                                "招生批次": item.get('local_batch_name', '-'),
+                                "学制": length,
+                                "计划人数": item.get('num', '-'),
+                                "备注": item.get('info', '-'),
+                                "学费": tuition,
+                            })
+                        else:
+                            print(f"警告: {school_name} 的项目不是字典，而是: {item}")
+    
+        return pd.DataFrame(items)
+    
+    # 开设专业
+    def process_pc_special(content, school_name, province_name, year):
+        items = []
+        if 'data' in content:
+            for item in content['data'].get('1', []):
+                temp_year = int(item['year'])
+                nation_feature = "国家特色专业" if item.get('nation_feature') == '1' else ''
+                nation_first_class = "国家一流本科" if item.get('nation_first_class') == '1' else ''
+                items.append({
+                    "学校名称": school_name,
+                    "省市区": province_name,
+                    "招生年份": temp_year,
+                    "专业名称": item['special_name'],
+                    "层次": item['type_name'],
+                    "学科门类": item['level2_name'],
+                    "专业类别": item['level3_name'],
+                    "学制": item['limit_year'],
+                    "学科等级": item.get('xueke_rank_score', ''),
+                    "国家特色专业": nation_feature,
+                    "国家一流本科": nation_first_class,
+                })
+            
+            for item in content['data']['special_detail'].get('1', []):
+                temp_year = int(item['year'])
+                nation_feature = "国家特色专业" if item.get('nation_feature') == '1' else ''
+                nation_first_class = "国家一流本科" if item.get('nation_first_class') == '1' else ''
+                items.append({
+                    "学校名称": school_name,
+                    "省市区": province_name,
+                    "招生年份": temp_year,
+                    "专业名称": item['special_name'],
+                    "层次": item['type_name'],
+                    "学科门类": item['level2_name'],
+                    "专业类别": item['level3_name'],
+                    "学制": item['limit_year'],
+                    "学科等级": item.get('xueke_rank_score', ''),
+                    "国家特色专业": nation_feature,
+                    "国家一流本科": nation_first_class,
+                })
+    
+            for item in content['data'].get('nation_feature', []):
+                temp_year = int(item['year'])
+                nation_feature = "国家特色专业" if item.get('nation_feature') == '1' else ''
+                nation_first_class = "国家一流本科" if item.get('nation_first_class') == '1' else ''
+                items.append({
+                    "学校名称": school_name,
+                    "省市区": province_name,
+                    "招生年份": temp_year,
+                    "专业名称": item['special_name'],
+                    "层次": item['type_name'],
+                    "学科门类": item['level2_name'],
+                    "专业类别": item['level3_name'],
+                    "学制": item['limit_year'],
+                    "学科等级": item.get('xueke_rank_score', ''),
+                    "国家特色专业": nation_feature,
+                    "国家一流本科": nation_first_class,
+                })
+    
+        return pd.DataFrame(items)
+    
+    # 学科评估
+    def process_xk_rank(content, school_name, province_name, year):
+        items = []
+        for item_list in content.get('data', {}).get('item', []):
+            for item in item_list:
+                items.append({
+                    "学校名称": school_name,
+                    "学科名称": item['xueke_name'],
+                    "评估等级": item['xueke_rank_score'],
+                    "评估轮次": content.get('data', {}).get('round', [None])[0],
+                })
+    
+        return pd.DataFrame(items)
+    
+    src_file_path = os.path.join(src_folder, src_file_name)
+    
+    if not os.path.exists(src_file_path):
+        print(f"{src_file_path} 文件不存在！")
+        return
+    
+    school_ids = read_school_ids(src_file_path)
+    all_special_score_dataframes = []
+    all_province_score_dataframes = []
+    all_special_plan_dataframes = []
+    all_pc_special_dataframes = []
+    all_xk_rank_dataframes = []
+    error_log = []
+    
+    # 处理专业分数线数据
+    for school_id, school_name in school_ids.items():
+        special_score_url = f"{base_url_special_score}/{school_id}/{year}/{local_province_id}.json"
+        local_special_score_file = os.path.join(download_folder, f"{school_id}_{year}_{local_province_id}_specialscore.json")
+    
+        if download_file(special_score_url, local_special_score_file):
+            try:
+                with open(local_special_score_file, 'r', encoding='utf-8') as f:
+                    content = json.load(f)
+                    if content.get("numFound") == 0 or content.get("code") == "0003":
+                        print("年份错误，非开启年。请重新输入年份！")
+                        break
+    
+                    df_special = process_json_to_dataframe(
+                        content, school_name, school_id, 
+                        province_id_name_mapping.get(local_province_id, "未知省份"), 
+                        year
+                    )
+                    all_special_score_dataframes.append(df_special)
+            except FileNotFoundError:
+                error_log.append(f"文件 {local_special_score_file} 未找到，学校名称: {school_name}, 学校代码: {school_id}")
+            except json.JSONDecodeError:
+                error_log.append(f"文件 {local_special_score_file} 解析失败，学校名称: {school_name}, 学校代码: {school_id}")
+        else:
+            error_log.append(f"下载失败: {special_score_url}，学校名称: {school_name}, 学校代码: {school_id}")
+    
+    # 处理省市分数线数据
+    for school_id, school_name in school_ids.items():
+        province_score_url = f"{base_url_province_score}/{school_id}/{year}/{local_province_id}.json"
+        local_province_score_file = os.path.join(download_folder, f"{school_id}_{year}_{local_province_id}_provincescore.json")
+    
+        if download_file(province_score_url, local_province_score_file):
+            try:
+                with open(local_province_score_file, 'r', encoding='utf-8') as f:
+                    content = json.load(f)
+                    df_province_score = process_province_score(
+                        content, school_name, school_id, year, local_province_id
+                    )
+                    all_province_score_dataframes.append(df_province_score)
+            except FileNotFoundError:
+                error_log.append(f"文件 {local_province_score_file} 未找到，学校名称: {school_name}, 学校代码: {school_id}")
+            except json.JSONDecodeError:
+                error_log.append(f"文件 {local_province_score_file} 解析失败，学校名称: {school_name}, 学校代码: {school_id}")
+        else:
+            error_log.append(f"下载失败: {province_score_url}，学校名称: {school_name}, 学校代码: {school_id}")
+    
+    # 处理学校专业计划数据
+    for school_id, school_name in school_ids.items():
+        special_plan_url = f"{base_url_special_plan}/{school_id}/{year}/{local_province_id}.json"
+        local_special_plan_file = os.path.join(download_folder, f"{school_id}_{year}_{local_province_id}_schoolspecialplan.json")
+    
+        if download_file(special_plan_url, local_special_plan_file):
+            try:
+                with open(local_special_plan_file, 'r', encoding='utf-8') as f:
+                    content = json.load(f)
+                    df_special_plan = process_special_plan_json(
+                        content, school_name, school_id, 
+                        province_id_name_mapping.get(local_province_id, "未知省份"),
+                        year
+                    )
+                    all_special_plan_dataframes.append(df_special_plan)
+            except FileNotFoundError:
+                error_log.append(f"文件 {local_special_plan_file} 未找到，学校名称: {school_name}, 学校代码: {school_id}")
+            except json.JSONDecodeError:
+                error_log.append(f"文件 {local_special_plan_file} 解析失败，学校名称: {school_name}, 学校代码: {school_id}")
+        else:
+            error_log.append(f"下载失败: {special_plan_url}，学校名称: {school_name}, 学校代码: {school_id}")
+    
+    # 处理专业开设数据
+    for school_id, school_name in school_ids.items():
+        pc_special_url = f"{base_url_pc_special}/{school_id}/pc_special.json"
+        local_pc_special_file = os.path.join(download_folder, f"{school_id}_{year}_pcspecial.json")
+    
+        if download_file(pc_special_url, local_pc_special_file):
+            try:
+                with open(local_pc_special_file, 'r', encoding='utf-8') as f:
+                    content = json.load(f)
+                    df_pc_special = process_pc_special(content, school_name, province_id_name_mapping.get(local_province_id, "未知省份"), year)
+                    all_pc_special_dataframes.append(df_pc_special)
+            except FileNotFoundError:
+                error_log.append(f"文件 {local_pc_special_file} 未找到，学校名称: {school_name}, 学校代码: {school_id}")
+            except json.JSONDecodeError:
+                error_log.append(f"文件 {local_pc_special_file} 解析失败，学校名称: {school_name}, 学校代码: {school_id}")
+        else:
+            error_log.append(f"下载失败: {pc_special_url}，学校名称: {school_name}, 学校代码: {school_id}")
+    
+    # 处理学科评估数据
+    for school_id, school_name in school_ids.items():
+        xk_rank_url = f"{base_url_xk_rank}/{school_id}/xueke_rank.json"
+        local_xk_rank_file = os.path.join(download_folder, f"{school_id}_{year}_xkrank.json")
+    
+        if download_file(xk_rank_url, local_xk_rank_file):
+            try:
+                with open(local_xk_rank_file, 'r', encoding='utf-8') as f:
+                    content = json.load(f)
+                    df_xk_rank = process_xk_rank(content, school_name, province_id_name_mapping.get(local_province_id, "未知省份"), year)
+                    all_xk_rank_dataframes.append(df_xk_rank)
+            except FileNotFoundError:
+                error_log.append(f"文件 {local_xk_rank_file} 未找到，学校名称: {school_name}, 学校代码: {school_id}")
+            except json.JSONDecodeError:
+                error_log.append(f"文件 {local_xk_rank_file} 解析失败，学校名称: {school_name}, 学校代码: {school_id}")
+        else:
+            error_log.append(f"下载失败: {xk_rank_url}，学校名称: {school_name}, 学校代码: {school_id}")
+    
+    # 输出学校专业分数线数据到 Excel 文件
+    if all_special_score_dataframes:
+        result_special_score_df = pd.concat(all_special_score_dataframes, ignore_index=True)
+        excel_special_score_file_name = f"{file_choice}_专业分数线_{year}_{province_id_name_mapping.get(local_province_id)}.xlsx"
+        result_special_score_df.to_excel(os.path.join(excel_folder, province_name, excel_special_score_file_name), index=False)
+    
+    # 输出省市分数线数据到 Excel 文件
+    if all_province_score_dataframes:
+        result_province_score_df = pd.concat(all_province_score_dataframes, ignore_index=True)
+        excel_province_score_file_name = f"{file_choice}_省控线_{year}_{province_id_name_mapping.get(local_province_id)}.xlsx"
+        result_province_score_df.to_excel(os.path.join(excel_folder, province_name, excel_province_score_file_name), index=False)
+    
+    # 输出学校专业计划数据到 Excel 文件
+    if all_special_plan_dataframes:
+        result_special_plan_df = pd.concat(all_special_plan_dataframes, ignore_index=True)
+        excel_special_plan_file_name = f"{file_choice}_招生计划_{year}_{province_id_name_mapping.get(local_province_id)}.xlsx"
+        result_special_plan_df.to_excel(os.path.join(excel_folder, province_name, excel_special_plan_file_name), index=False)
+    
+    # 输出专业开设数据到 Excel 文件
+    if all_pc_special_dataframes:
+        result_pc_special_df = pd.concat(all_pc_special_dataframes, ignore_index=True)
+        excel_pc_special_file_name = f"{file_choice}_专业开设_{year}_{province_id_name_mapping.get(local_province_id)}.xlsx"
+        result_pc_special_df.to_excel(os.path.join(excel_folder, province_name, excel_pc_special_file_name), index=False)
+    
+    # 输出学科评估数据到 Excel 文件
+    if all_xk_rank_dataframes:
+        result_xk_rank_df = pd.concat(all_xk_rank_dataframes, ignore_index=True)
+        excel_xk_rank_file_name = f"{file_choice}_学科评估_{year}_{province_id_name_mapping.get(local_province_id)}.xlsx"
+        result_xk_rank_df.to_excel(os.path.join(excel_folder, province_name, excel_xk_rank_file_name), index=False)
+    
+    if error_log:
+        error_log_file_path = os.path.join(excel_folder, "error.log")
+        with open(error_log_file_path, 'w', encoding='utf-8') as f:
+            for error in error_log:
+                f.write(error + '\n')
+        print(f"错误日志已保存到 {error_log_file_path}")
+    
+    print("\n处理完成！请按 Enter 键退出。")
+    input()
 
 def search_menu():
     while True:
@@ -1219,41 +1624,9 @@ def run_code(choice):
             input("按 Enter 键继续...") 
             break
         elif choice == 6:
-            while True:
-                # 一键获取学校全部信息，按照指定顺序执行代码
-                for code in [1, 2, 3, 4, 5]:
-                    try:
-                        if code == 1:
-                            # 查询院校分数线
-                            run_code(code)
-                        elif code == 2:
-                            # 专业分数线
-                            run_code(code)
-                        elif code == 3:
-                            # 查询招生计划
-                            run_code(code)
-                        elif code == 4:
-                            # 查询开设专业
-                            run_code(code)
-                        elif code == 5:
-                            # 查询学科评估
-                            run_code(code)
-                        else:
-                            print("无效的 code，请检查并重试！")
-                    except Exception as e:
-                        print(f"执行代码 {code} 时发生错误: {e}")
-                # 提示用户是否重新输入学校ID，继续查询
-                print("\n查询已完成!")
-                while True:
-                    continue_search = input(Fore.GREEN + "是否继续一键查询学校全部信息？（Y/n，默认按 Enter 键继续）：" + Style.RESET_ALL) or 'y'
-                    if continue_search.lower() == 'y':
-                        school_id = input("请输入新的学校ID: ").strip()  # 提示用户输入新的学校ID，继续进行下一个学校的查询。
-                        break  # 跳出内层循环，继续查询
-                    elif continue_search.lower() == 'n':
-                        os.system('cls' if os.name == 'nt' else 'clear')  # 清屏
-                        return  # 返回主菜单
-                    else:
-                        print("无效的输入，请输入 'Y' 或 'n'")        
+            os.system('cls' if os.name == 'nt' else 'clear')
+            batch_alldata()
+            return
         elif choice == 7:
             os.system('cls' if os.name == 'nt' else 'clear')
             # 查询省市区代码或学校ID号
@@ -1434,13 +1807,13 @@ def main():
         print(Fore.GREEN + " [3] 查询招生计划")
         print(Fore.GREEN + " [4] 查询开设专业")
         print(Fore.GREEN + " [5] 查询学科评估")
-        print(Fore.GREEN + " [6] 一键查询学校全部信息\n")
+        print(Fore.GREEN + " [6] 批量查询学校全部信息\n")
         print(Fore.GREEN + " [7] 查询省市区代码或学校ID号\n")
         print(Fore.RED + " [8] 重新定义：省市区代码、文理科代码、学校ID、录取年份等参数\n" + Style.RESET_ALL)
         print(Fore.GREEN + " [9] 查询一分一段\n")
         print(Fore.CYAN + " [10] 清空download文件夹")
         print(Fore.CYAN + " [11] 更新学校id(默认不需要执行)\n" + Style.RESET_ALL)
-        print(Fore.GREEN + " [12] 合并下载的专业分数线、院校分数线、开设专业、招生计划、学科评估数据" + Style.RESET_ALL)
+        print(Fore.GREEN + " [12] 合并下载的学校各省分数线、专业分数线、开设专业、开设专业数据" + Style.RESET_ALL)
         print(Fore.GREEN + " [13] 将CSV文件批量转换成XLSX文件\n" + Style.RESET_ALL)
         print(Fore.RED + " [0] 退出\n" + Style.RESET_ALL)
         print("=========================================\n")
